@@ -55,6 +55,7 @@ class Tests {
         assertTrue(circleInside(2.0, 2.0, 2.0, 2.0, 2.0, 2.0))
         assertTrue(circleInside(-2.0, 3.0, 2.0, -2.0, 0.0, 5.0))
         assertFalse(circleInside(1.0, 2.0, 3.0, 4.0, 5.0, 6.0))
+        assertTrue(circleInside(1.0, 1.0, 1.0, 0.0, 0.0, 30.0))
     }
 
     @Test
