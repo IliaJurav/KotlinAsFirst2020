@@ -72,7 +72,7 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    if ((age % 100) in 11..14) return "$age лет"
+    if (age % 100 in 11..14) return "$age лет"
     return when (age % 10) {
         1 -> "$age год"
         in 2..4 -> "$age года"
@@ -97,8 +97,8 @@ fun timeForHalfWay(
     val s3 = v3 * t3
     val sh = (s1 + s2 + s3) / 2.0
     return when {
-        (s1 > sh) -> sh / v1
-        ((s1 + s2) > sh) -> t1 + (sh - s1) / v2
+        s1 > sh -> sh / v1
+        (s1 + s2) > sh -> t1 + (sh - s1) / v2
         else -> t1 + t2 + (sh - (s1 + s2)) / v3
     }
 }
@@ -167,18 +167,18 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
     } else {
         xa = a; xb = b
     }
-    if (c > xb) xc = c else {
+    if (c > xb) {
+        xc = c
+    } else {
         xc = xb; xb = c
     }
     // вычисляем разность квадратов сторон
     val rez: Double = sqr(xc) - sqr(xa) - sqr(xb)
     return when {
-        (xa + xb) <= xc -> -1 // треугольник не существует
-        else -> when {
-            rez < 0.0 -> 0    // остроугольный
-            rez == 0.0 -> 1   // прямоугольный
-            else -> 2         // тупоугольный
-        }
+        xa + xb <= xc -> -1 // треугольник не существует
+        rez < 0.0 -> 0      // остроугольный
+        rez == 0.0 -> 1     // прямоугольный
+        else -> 2           // тупоугольный
     }
 }
 
@@ -194,7 +194,7 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     val dist = min(b, d) - max(a, c)
     return when {
-        (dist >= 0) -> dist
+        dist >= 0 -> dist
         else -> -1
     }
 }

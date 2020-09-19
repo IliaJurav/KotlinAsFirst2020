@@ -30,12 +30,9 @@ fun isNumberHappy(number: Int) =
  * Считать, что ферзи не могут загораживать друг друга.
  */
 fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int) =
-    when {
-        (x1 == x2) -> true // на одной вертикали
-        (y1 == y2) -> true // на одной горизонтали
-        abs(x1 - x2) == abs(y1 - y2) -> true // на диагонали
-        else -> false
-    }
+    x1 == x2 || // на одной вертикали
+            y1 == y2 || // на одной горизонтали
+            abs(x1 - x2) == abs(y1 - y2) // на диагонали
 
 /**
  * Простая (2 балла)
@@ -78,12 +75,9 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int) =
-    when {
-        (r >= a) && (s >= b) -> true
-        (r >= b) && (s >= a) -> true
-        (r >= a) && (s >= c) -> true
-        (r >= c) && (s >= a) -> true
-        (r >= b) && (s >= c) -> true
-        (r >= c) && (s >= b) -> true
-        else -> false
-    }
+    (r >= a && s >= b) ||
+            (r >= b && s >= a) ||
+            (r >= a && s >= c) ||
+            (r >= c && s >= a) ||
+            (r >= b && s >= c) ||
+            (r >= c && s >= b)
