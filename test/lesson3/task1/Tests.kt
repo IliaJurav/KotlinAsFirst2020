@@ -178,6 +178,7 @@ class Tests {
         assertEquals(3, revert(3))
         assertEquals(111, revert(111))
         assertEquals(17571, revert(17571))
+        assertEquals(57071, revert(17075))
         assertEquals(123456789, revert(987654321))
     }
 
