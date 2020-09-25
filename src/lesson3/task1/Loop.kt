@@ -83,10 +83,10 @@ fun digitNumber(n: Int): Int = if (n < 10) 1 else digitNumber(n / 10) + 1
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
 fun fib(n: Int): Int {
-    var n2: Int
-    var n1: Int = 1
-    var rez: Int = 1
-    for (i in 3..n) {
+    var n2: Int // fib(n-2)
+    var n1 = 1  // fib(n-1)
+    var rez = 1 // fib(n) for n in 1..2 = 1
+    for (i in 3..n) { // for n > 2
         n2 = n1
         n1 = rez
         rez = n2 + n1
@@ -100,11 +100,11 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    if (n % 2 == 0) return 2
+    if (n % 2 == 0) return 2  // check if the number is even
     for (m in 3..sqrt(n.toDouble()).toInt() step 2) {
-        if (n % m == 0) return m
+        if (n % m == 0) return m  // divisor found
     }
-    return n
+    return n // the number has no divisors
 }
 
 /**
@@ -149,13 +149,13 @@ fun collatzSteps(x: Int): Int {
  * минимальное число k, которое делится и на m и на n без остатка
  */
 fun lcm(m: Int, n: Int): Int {
-    var rn: Int = n
-    var rm: Int = m
+    var rn: Int = n // a multiple of the n
+    var rm: Int = m // a multiple of the m
     while (rm != rn) {
-        if (rm < rn) {
+        if (rm < rn) { // necessary to increase the multiple of m
             if ((rn - rm) % m == 0) return rn
             else rm += m * ((rn - rm) / m + 1)
-        } else {
+        } else { // necessary to increase the multiple of n
             if ((rm - rn) % n == 0) return rm
             else rn += n * ((rm - rn) / n + 1)
         }
@@ -171,10 +171,10 @@ fun lcm(m: Int, n: Int): Int {
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
-    if (n % 2 == 0 && m % 2 == 0) return false
-    if (n % m == 0 || m % n == 0) return false
+    if (n % 2 == 0 && m % 2 == 0) return false // both numbers are even
+    if (n % m == 0 || m % n == 0) return false // numbers mutually multiple
     for (i in 3..sqrt(min(n, m).toDouble()).toInt() step 2)
-        if (n % i == 0 && m % i == 0) return false
+        if (n % i == 0 && m % i == 0) return false  // common divisor detected
     return true
 }
 
@@ -187,12 +187,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  */
 fun squareBetweenExists(m: Int, n: Int) =
     sqr(sqrt(n.toDouble()).toInt()) >= m
-//{
-//    var g: Int = 1
-//     for (i in 1..n)
-//        if (m <= sqr(g) <= n)
-//
-//}
+
 
 /**
  * Средняя (3 балла)
@@ -203,7 +198,7 @@ fun squareBetweenExists(m: Int, n: Int) =
  */
 fun revert(n: Int): Int {
     var s = 0
-    var nk: Int = n
+    var nk = n
     while (nk > 0) {
         s = s * 10 + nk % 10
         nk /= 10
@@ -232,11 +227,11 @@ fun isPalindrome(n: Int) = n == revert(n)
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun hasDifferentDigits(n: Int): Boolean {
-    var c = n % 10
-    var x = n
-    while (x > 9) {
+    val c = n % 10 // get first digit
+    var x = n / 10
+    while (x > 0) {
+        if (c != x % 10) return true // another digit found
         x /= 10
-        if (c != x % 10) return true
     }
     return false
 }
@@ -255,7 +250,7 @@ fun sin(x: Double, eps: Double): Double {
     var s = x - 2.0 * PI * (x / (2.0 * PI)).toInt().toDouble()
     var d = s
     var n = 1
-    var x2 = -sqr(s)
+    val x2 = -sqr(s)
     do {
         n += 2
         d *= x2
@@ -278,7 +273,7 @@ fun cos(x: Double, eps: Double): Double {
     var d = 1.0
     var s = 1.0
     var n = 0
-    var x2 = -sqr(x - 2.0 * PI * (x / (2.0 * PI)).toInt().toDouble())
+    val x2 = -sqr(x - 2.0 * PI * (x / (2.0 * PI)).toInt().toDouble())
     do {
         n += 2
         d *= x2
@@ -298,14 +293,14 @@ fun cos(x: Double, eps: Double): Double {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun squareSequenceDigit(n: Int): Int {
-    var i = 0
-    var s = 0
-    do {
+    var i = 0 // the number to be squared
+    var s = 0 // counter of the number of digits
+    do { // searching for a number corresponding to a given length
         i++
         s += digitNumber(sqr(i))
     } while (s < n)
     i *= i
-    while (s-- > n)
+    while (s-- > n) // searching for the desired digit in a number
         i /= 10
     return i % 10
 }
