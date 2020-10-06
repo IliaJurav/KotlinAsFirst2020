@@ -123,15 +123,7 @@ fun buildSumExample(list: List<Int>) =
  * Модуль пустого вектора считать равным 0.0.
  */
 fun abs(v: List<Double>) = if (v.isEmpty()) 0.0 else sqrt(v.sumOf { sqr(it) })
-//        : Double {
-//    if (v.isEmpty()) return 0.0
-//    //var n = 0.0
-//    //for (d in v) n += sqr(d)
-//    //v.forEach { n += sqr(it) }
-//    //v.sumOf { sqr(it) }
-//    return sqrt(v.sumOf { sqr(it) })
-//    //return sqrt(n)
-//}
+
 
 /**
  * Простая (2 балла)
@@ -139,12 +131,7 @@ fun abs(v: List<Double>) = if (v.isEmpty()) 0.0 else sqrt(v.sumOf { sqr(it) })
  * Рассчитать среднее арифметическое элементов списка list. Вернуть 0.0, если список пуст
  */
 fun mean(list: List<Double>) = if (list.isEmpty()) 0.0 else list.average()
-//        : Double {
-//    if (list.isEmpty()) return 0.0
-//    var n = 0.0
-//    for (d in list) n += d
-//    return n / list.size
-//}
+
 
 /**
  * Средняя (3 балла)
@@ -159,7 +146,6 @@ fun center(list: MutableList<Double>): MutableList<Double> =
     else {
         val m = list.average()
         for (i in list.indices) list[i] -= m
-        //list.forEachIndexed { i, _ -> list[i] -= m }
         list
     }
 
@@ -189,7 +175,7 @@ fun times(a: List<Int>, b: List<Int>) =
  */
 fun polynom(p: List<Int>, x: Int): Int {
     var ax = 1
-    var rez = 0
+    var rez = 0 // polynomial result
     for (i in p.indices) {
         rez += p[i] * ax
         ax *= x
@@ -226,13 +212,13 @@ fun accumulate(list: MutableList<Int>): MutableList<Int> {
 fun factorize(n: Int): List<Int> {
     val rez = mutableListOf<Int>()
     var nn = n
-    while (nn % 2 == 0) {
+    while (nn % 2 == 0) { // multiplicity check for two
         rez.add(2)
         nn /= 2
     }
     val maxDiv = sqrt(n.toDouble()).toInt()
-    for (i in 3..maxDiv step 2) {
-        while (nn % i == 0) {
+    for (i in 3..maxDiv step 2) { // multiplicity check for odd
+        while (nn % i == 0) { 
             rez.add(i)
             nn /= i
         }
@@ -278,9 +264,9 @@ fun factorizeToString(n: Int): String {
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int>{
-   val rez = mutableListOf<Int>()
+    val rez = mutableListOf<Int>()
     var g = n
-    while (g > 0){
+    while (g > 0) {
         rez.add(g % base)
         g /= base
     }
@@ -370,7 +356,7 @@ fun roman(n: Int): String {
  */
 fun russian(n: Int): String {
     if (n == 0) return "ноль"
-    val words = listOf(
+    val words = listOf( // list of numerals
         "три", "четыре", "пять", "шесть", "семь", "восемь",
         "девять", "десять", "одиннадцать", "двенадцать", "тринадцать",
         "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать",
@@ -379,21 +365,21 @@ fun russian(n: Int): String {
         "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот",
         "восемьсот", "девятьсот"
     )
-    val names = listOf(
+    val names = listOf( // list of title ranks
         "тысяча", "тысячи", "тысяч", "миллион", "миллиона",
         "миллионов", "миллиард", "миллиарда", "миллиардов"
     )
-    var mast = 1_000_000_000
+    var mast = 1_000_000_000 // start from billion
     var rez = ""
     for (i in 3 downTo 0) {
-        var d = n / mast % 1000
+        var d = n / mast % 1000  //  triad computation
         mast /= 1000
-        if (d == 0) continue
+        if (d == 0) continue  // triad is zero
         if (d > 99) {
-            rez += " " + words[d / 100 + 24]
+            rez += " " + words[d / 100 + 24] // rank of hundreds
             d %= 100
         }
-        if (d > 19) {
+        if (d > 19) { // rank of tens
             rez += " " + words[d / 10 + 15]
             d %= 10
         }
@@ -401,9 +387,9 @@ fun russian(n: Int): String {
             0 -> ""
             1 -> if (i == 1) " одна" else " один"
             2 -> if (i == 1) " две" else " два"
-            else -> " " + words[d - 3]
+            else -> " " + words[d - 3] // rank of teens and units
         }
-        if (i > 0) rez += when (d) {
+        if (i > 0) rez += when (d) { // add title rank
             1 -> " " + names[i * 3 - 3]
             in 2..4 -> " " + names[i * 3 - 2]
             else -> " " + names[i * 3 - 1]
