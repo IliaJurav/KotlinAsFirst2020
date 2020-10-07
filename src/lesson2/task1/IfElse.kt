@@ -145,7 +145,7 @@ fun rookOrBishopThreatens(
     kingY == rookY -> 1
     else -> 0
 } + when {
-    (abs(kingX - bishopX) == abs(kingY - bishopY)) -> 2
+    abs(kingX - bishopX) == abs(kingY - bishopY) -> 2
     else -> 0
 }
 
@@ -173,7 +173,7 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
         xc = xb; xb = c
     }
     // вычисляем разность квадратов сторон
-    val rez: Double = sqr(xc) - sqr(xa) - sqr(xb)
+    val rez = sqr(xc) - sqr(xa) - sqr(xb)
     return when {
         xa + xb <= xc -> -1 // треугольник не существует
         rez < 0.0 -> 0      // остроугольный

@@ -2,6 +2,7 @@
 
 package lesson4.task1
 
+import com.oracle.webservices.internal.api.message.ContentType
 import lesson1.task1.discriminant
 import lesson1.task1.sqr
 import kotlin.math.sqrt
@@ -218,7 +219,7 @@ fun factorize(n: Int): List<Int> {
     }
     val maxDiv = sqrt(n.toDouble()).toInt()
     for (i in 3..maxDiv step 2) { // multiplicity check for odd
-        while (nn % i == 0) { 
+        while (nn % i == 0) {
             rez.add(i)
             nn /= i
         }
@@ -236,25 +237,7 @@ fun factorize(n: Int): List<Int> {
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String {
-    var rez = ""
-    var nn = n
-    while (nn % 2 == 0) {
-        rez += "*2"
-        nn /= 2
-    }
-    val maxDiv = sqrt(n.toDouble()).toInt()
-    for (i in 3..maxDiv step 2) {
-        while (nn % i == 0) {
-            rez += "*$i"
-            nn /= i
-        }
-        if (i >= nn) break
-    }
-    if (nn > 1) rez += "*$nn"
-    return rez.drop(1)
-}
-
+fun factorizeToString(n: Int) = factorize(n).joinToString(separator = "*")
 
 /**
  * Средняя (3 балла)
@@ -263,7 +246,7 @@ fun factorizeToString(n: Int): String {
  * Результат перевода вернуть в виде списка цифр в base-ичной системе от старшей к младшей,
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
-fun convert(n: Int, base: Int): List<Int>{
+fun convert(n: Int, base: Int): List<Int> {
     val rez = mutableListOf<Int>()
     var g = n
     while (g > 0) {
@@ -284,16 +267,9 @@ fun convert(n: Int, base: Int): List<Int>{
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, n.toString(base) и подобные), запрещается.
  */
-fun convertToString(n: Int, base: Int): String {
-    var rez = ""
-    val dig = "0123456789abcdefghijklmnopqrstuvwxyz"
-    var g = n
-    while (g > 0) {
-        rez += dig[g % base]
-        g /= base
-    }
-    return rez.reversed()
-}
+fun convertToString(n: Int, base: Int) =
+    convert(n, base).joinToString(separator = "")
+    { "0123456789abcdefghijklmnopqrstuvwxyz"[it].toString() }
 
 /**
  * Средняя (3 балла)
@@ -302,7 +278,7 @@ fun convertToString(n: Int, base: Int): String {
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int{
+fun decimal(digits: List<Int>, base: Int): Int {
     var rez = 0
     for (i in digits.indices) rez = rez * base + digits[i]
     return rez
@@ -326,6 +302,7 @@ fun decimalFromString(str: String, base: Int): Int {
     for (i in str.indices) rez = rez * base + dig.indexOf(str[i])
     return rez
 }
+
 /**
  * Сложная (5 баллов)
  *
@@ -335,16 +312,16 @@ fun decimalFromString(str: String, base: Int): Int {
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 fun roman(n: Int): String {
-    val k = arrayOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+    val k = listOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
     val sim = listOf("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
-    var rez = ""
+    val rez = StringBuilder()
     var nn = n
     for (i in k.indices)
-        while (nn >= k[i]){
+        while (nn >= k[i]) {
             nn -= k[i]
-            rez += sim[i]
+            rez.append(sim[i])
         }
-    return rez
+    return rez.toString()
 }
 
 /**
@@ -370,30 +347,34 @@ fun russian(n: Int): String {
         "миллионов", "миллиард", "миллиарда", "миллиардов"
     )
     var mast = 1_000_000_000 // start from billion
-    var rez = ""
+    val rez = StringBuilder()
     for (i in 3 downTo 0) {
         var d = n / mast % 1000  //  triad computation
         mast /= 1000
         if (d == 0) continue  // triad is zero
         if (d > 99) {
-            rez += " " + words[d / 100 + 24] // rank of hundreds
+            rez.append(' ').append(words[d / 100 + 24]) // rank of hundreds
             d %= 100
         }
         if (d > 19) { // rank of tens
-            rez += " " + words[d / 10 + 15]
+            rez.append(' ').append(words[d / 10 + 15])
             d %= 10
         }
-        rez += when (d) {
-            0 -> ""
-            1 -> if (i == 1) " одна" else " один"
-            2 -> if (i == 1) " две" else " два"
-            else -> " " + words[d - 3] // rank of teens and units
-        }
-        if (i > 0) rez += when (d) { // add title rank
-            1 -> " " + names[i * 3 - 3]
-            in 2..4 -> " " + names[i * 3 - 2]
-            else -> " " + names[i * 3 - 1]
-        }
+        rez.append(
+            when (d) {
+                0 -> ""
+                1 -> if (i == 1) " одна" else " один"
+                2 -> if (i == 1) " две" else " два"
+                else -> " " + words[d - 3] // rank of teens and units
+            }
+        )
+        if (i > 0) rez.append(
+            when (d) { // add title rank
+                1 -> " " + names[i * 3 - 3]
+                in 2..4 -> " " + names[i * 3 - 2]
+                else -> " " + names[i * 3 - 1]
+            }
+        )
     }
-    return rez.drop(1)
+    return rez.drop(1).toString()
 }

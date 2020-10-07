@@ -73,7 +73,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = if (n < 10) 1 else digitNumber(n / 10) + 1
+fun digitNumber(n: Int): Int = if (n in -9..9) 1 else digitNumber(n / 10) + 1
 
 
 /**
@@ -83,11 +83,10 @@ fun digitNumber(n: Int): Int = if (n < 10) 1 else digitNumber(n / 10) + 1
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
 fun fib(n: Int): Int {
-    var n2: Int // fib(n-2)
     var n1 = 1  // fib(n-1)
     var rez = 1 // fib(n) for n in 1..2 = 1
     for (i in 3..n) { // for n > 2
-        n2 = n1
+        val n2 = n1 // fib(n-2)
         n1 = rez
         rez = n2 + n1
     }
@@ -149,8 +148,8 @@ fun collatzSteps(x: Int): Int {
  * минимальное число k, которое делится и на m и на n без остатка
  */
 fun lcm(m: Int, n: Int): Int {
-    var rn: Int = n // a multiple of the n
-    var rm: Int = m // a multiple of the m
+    var rn = n // a multiple of the n
+    var rm = m // a multiple of the m
     while (rm != rn) {
         if (rm < rn) { // necessary to increase the multiple of m
             if ((rn - rm) % m == 0) return rn
@@ -292,6 +291,13 @@ fun cos(x: Double, eps: Double): Double {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
+fun getDigitFromPos(n: Int, p: Int): Int {
+    var nn = n
+    for (i in 1..p) // searching for the desired digit in a number
+        nn /= 10
+    return nn % 10
+}
+
 fun squareSequenceDigit(n: Int): Int {
     var i = 0 // the number to be squared
     var s = 0 // counter of the number of digits
@@ -299,10 +305,7 @@ fun squareSequenceDigit(n: Int): Int {
         i++
         s += digitNumber(sqr(i))
     } while (s < n)
-    i *= i
-    while (s-- > n) // searching for the desired digit in a number
-        i /= 10
-    return i % 10
+    return getDigitFromPos(sqr(i), s - n)
 }
 
 /**
@@ -321,8 +324,5 @@ fun fibSequenceDigit(n: Int): Int {
         i++
         s += digitNumber(fib(i))
     } while (s < n)
-    i = fib(i)
-    while (s-- > n)
-        i /= 10
-    return i % 10
+    return getDigitFromPos(fib(i), s - n)
 }
