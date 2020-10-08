@@ -311,17 +311,15 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String {
+fun roman(n: Int) = buildString {
     val k = listOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
     val sim = listOf("M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I")
-    val rez = StringBuilder()
     var nn = n
     for (i in k.indices)
         while (nn >= k[i]) {
             nn -= k[i]
-            rez.append(sim[i])
+            append(sim[i])
         }
-    return rez.toString()
 }
 
 /**
@@ -331,50 +329,48 @@ fun roman(n: Int): String {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String {
-    if (n == 0) return "ноль"
-    val words = listOf( // list of numerals
-        "три", "четыре", "пять", "шесть", "семь", "восемь",
-        "девять", "десять", "одиннадцать", "двенадцать", "тринадцать",
-        "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать",
-        "восемнадцать", "девятнадцать", "двадцать", "тридцать", "сорок",
-        "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто",
-        "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот",
-        "восемьсот", "девятьсот"
-    )
-    val names = listOf( // list of title ranks
-        "тысяча", "тысячи", "тысяч", "миллион", "миллиона",
-        "миллионов", "миллиард", "миллиарда", "миллиардов"
-    )
-    var mast = 1_000_000_000 // start from billion
-    val rez = StringBuilder()
-    for (i in 3 downTo 0) {
-        var d = n / mast % 1000  //  triad computation
-        mast /= 1000
-        if (d == 0) continue  // triad is zero
-        if (d > 99) {
-            rez.append(' ').append(words[d / 100 + 24]) // rank of hundreds
-            d %= 100
-        }
-        if (d > 19) { // rank of tens
-            rez.append(' ').append(words[d / 10 + 15])
-            d %= 10
-        }
-        rez.append(
+fun russian(n: Int) = buildString {
+    if (n == 0) {
+        append("ноль")
+    } else {
+        val words = listOf( // list of numerals
+            "три", "четыре", "пять", "шесть", "семь", "восемь",
+            "девять", "десять", "одиннадцать", "двенадцать", "тринадцать",
+            "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать",
+            "восемнадцать", "девятнадцать", "двадцать", "тридцать", "сорок",
+            "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят", "девяносто",
+            "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот",
+            "восемьсот", "девятьсот"
+        )
+        val names = listOf( // list of title ranks
+            "тысяча", "тысячи", "тысяч", "миллион", "миллиона",
+            "миллионов", "миллиард", "миллиарда", "миллиардов"
+        )
+        var mast = 1_000_000_000 // start from billion
+        for (i in 3 downTo 0) {
+            var d = n / mast % 1000  //  triad computation
+            mast /= 1000
+            if (d == 0) continue  // triad is zero
+            if (d > 99) {
+                append(' ').append(words[d / 100 + 24]) // rank of hundreds
+                d %= 100
+            }
+            if (d > 19) { // rank of tens
+                append(' ').append(words[d / 10 + 15])
+                d %= 10
+            }
             when (d) {
-                0 -> ""
-                1 -> if (i == 1) " одна" else " один"
-                2 -> if (i == 1) " две" else " два"
-                else -> " " + words[d - 3] // rank of teens and units
+                1 -> append(if (i == 1) " одна" else " один")
+                2 -> append(if (i == 1) " две" else " два")
+                in 3..19 -> append(' ').append(words[d - 3]) // rank of teens and units
             }
-        )
-        if (i > 0) rez.append(
-            when (d) { // add title rank
-                1 -> " " + names[i * 3 - 3]
-                in 2..4 -> " " + names[i * 3 - 2]
-                else -> " " + names[i * 3 - 1]
-            }
-        )
+            if (i > 0) append(' ').append(
+                when (d) { // add title rank
+                    1 -> names[i * 3 - 3]
+                    in 2..4 -> names[i * 3 - 2]
+                    else -> names[i * 3 - 1]
+                }
+            )
+        }
     }
-    return rez.drop(1).toString()
-}
+}.trim()
