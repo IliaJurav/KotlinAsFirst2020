@@ -319,12 +319,14 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    with(list.mapIndexed { index, i -> Pair(index, i) }.filter { (index, it) ->
-        list.contains(number - it) && list.lastIndexOf(number - it) != index
-    }) {
-        return if (size < 2) Pair(-1, -1)
-        else Pair(elementAt(0).first, elementAt(1).first)
+    var a = -1
+    var b = -1
+    list.forEachIndexed { index, value ->
+        if (list.contains(number - value))
+            if (a == -1) a = index else
+                if (b == -1) if (list[a] + value == number) b = index
     }
+    return if (b == -1) Pair(-1, -1) else Pair(a, b)
 }
 
 /**
@@ -352,7 +354,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     // отсортировать предметы сначала самые легкие и только те, что лезут в сумку
     // и поместить в List, чтобы иметь доступ по индексам
-    val sps = treasures.entries.filter { it.value.first <= capacity }
+    val sps = treasures.entries.filter { it.value.first in 1..capacity && it.value.second > 0 }
         .sortedBy { it.value.first }//
     // если ничего не подходит, то и нечего взять
     if (capacity < 1 || sps.count() == 0) return emptySet()
@@ -365,8 +367,14 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     var maxCost = 0 // максимальная стоимость
     val rez = mutableSetOf<Int>() // лучший по стоимости набор
     var pnt = 0     // индекс предмета, с которого будем пытаться запихнуть
+    var alarm = 0     // индекс предмета, с которого будем пытаться запихнуть
     // цикл перебора вариантов предметов
     while (true) {
+        if (++alarm > 1000_000) return rez.map { sps[it].key }.toSet() +
+                setOf(
+                    "cap=$capacity", "tr=" + treasures.count().toString(),
+                    "sps=" + sps.count().toString()
+                )
         // рассчитать вес предметов уже находящихся в сумке
         var ves = bag.sumOf { ind -> treasVes[ind] }
         // цикл подбора текущего варианта
