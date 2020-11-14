@@ -175,6 +175,13 @@ class Tests {
             )
         )
         assertEquals(
+            mapOf("a" to "Cupkb-c/CM)qsuib,COsy+xu5y-"),
+            mergePhoneBooks(
+                mapOf("a" to "Cupkb-c/CM)qsuib,COsy+xu5y-"),
+                mapOf()
+            )
+        )
+        assertEquals(
             mapOf("Emergency" to "112, 911", "Police" to "02"),
             mergePhoneBooks(
                 mapOf("Emergency" to "112"),
@@ -234,6 +241,7 @@ class Tests {
     fun canBuildFrom() {
         assertFalse(canBuildFrom(emptyList(), "foo"))
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
+        assertTrue(canBuildFrom(listOf(), ""))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
     }
 
@@ -311,6 +319,10 @@ class Tests {
         assertEquals(
             Pair(0, 2),
             findSumOfTwo(listOf(1, 2, 3), 4)
+        )
+        assertEquals(
+            Pair(0, 1),
+            findSumOfTwo(listOf(0, 0), 0)
         )
         assertEquals(
             Pair(-1, -1),
