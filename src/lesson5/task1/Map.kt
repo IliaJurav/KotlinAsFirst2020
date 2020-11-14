@@ -169,7 +169,8 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>) =
                                 with(mapB.getOrDefault(name, "")
                                     .splitToSequence(",").toList()
                                     .filter { phone ->
-                                        phone.trim() !in mapA.getValue(name).splitToSequence(",").map { it.trim() }.toSet()
+                                        phone.trim() !in mapA.getValue(name)
+                                        .splitToSequence(",").map { it.trim() }.toSet()
                                     })
                                 {
                                     if (size > 0) joinToString(prefix = ", ", separator = ",") else ""
