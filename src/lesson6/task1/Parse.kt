@@ -197,7 +197,7 @@ fun mostExpensive(description: String): String = TODO()
  * Римские цифры: 1 = I, 4 = IV, 5 = V, 9 = IX, 10 = X, 40 = XL, 50 = L,
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: XXIII = 23, XLIV = 44, C = 100
- *
+ * CDLXXXVI 486
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
@@ -205,7 +205,7 @@ fun fromRoman(roman: String): Int {
             roman
         )
     ) return -1
-    return Regex("CM|IV|IX|XL|XC|X|I|M|C|V|D|L")
+    return Regex("CM|CD|IV|IX|XL|XC|X|I|M|C|V|D|L")
         .findAll(roman).fold(0, { acc, m ->
             acc + when (m.value) {
                 "I" -> 1
