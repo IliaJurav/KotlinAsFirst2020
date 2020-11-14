@@ -2,6 +2,7 @@
 
 package lesson5.task1
 
+import java.time.LocalDateTime
 import kotlin.time.seconds
 
 // Урок 5: ассоциативные массивы и множества
@@ -160,15 +161,21 @@ fun whoAreInBoth(a: List<String>, b: List<String>) =
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>) =
-    if (mapB.isEmpty()) mapA else if (mapA.isEmpty()) mapB else
-        (mapA.map { it.key }.toSet() + mapB.map { it.key }.toSet())
-            .map { name ->
-                name to (mapA.getOrDefault(name, "") + "," + mapB.getOrDefault(
-                    name,
-                    ""
-                )).splitToSequence(",")
-                    .filter { it.isNotEmpty() }.toSet().joinToString(separator = ", ")
-            }.toMap()
+    (mapA.keys + mapB.keys).map { name ->
+        name to
+                if (!mapB.containsKey(name)) mapA.getOrDefault(name, "") else
+                    if (!mapA.containsKey(name)) mapB.getOrDefault(name, "") else
+                        mapA.getOrDefault(name, "") +
+                                with(mapB.getOrDefault(name, "").splitToSequence(",").toList()
+                                    .filter { mapA.getValue(name).indexOf(it.trim()) == -1 })
+                                {
+                                    if (size > 0) joinToString(
+                                        prefix = ", ",
+                                        separator = ","
+                                    ) else ""
+                                }
+
+    }.toMap()
 
 
 /**
@@ -286,7 +293,6 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
         for (n in ss)
             if (n !in ex) {
                 ex.add(n)
-
                 if (n in friends) ee.addAll(sf(friends.getValue(n), ex))
                 ee.add(n)
             }
@@ -368,13 +374,19 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     val rez = mutableSetOf<Int>() // лучший по стоимости набор
     var pnt = 0     // индекс предмета, с которого будем пытаться запихнуть
     var alarm = 0     // индекс предмета, с которого будем пытаться запихнуть
+    val sta = LocalDateTime.now().second
+    println(LocalDateTime.now())
     // цикл перебора вариантов предметов
     while (true) {
-        if (++alarm > 1000_000) return rez.map { sps[it].key }.toSet() +
-                setOf(
-                    "cap=$capacity", "tr=" + treasures.count().toString(),
-                    "sps=" + sps.count().toString()
-                )
+        alarm++
+        if ((LocalDateTime.now().second - sta + 60) % 60 > 6) {
+            println(LocalDateTime.now())
+            return rez.map { sps[it].key }.toSet() +
+                    setOf(
+                        "ala=$alarm", "cap=$capacity", "tr=" + treasures.count().toString(),
+                        "sps=" + sps.count().toString()
+                    )
+        }
         // рассчитать вес предметов уже находящихся в сумке
         var ves = bag.sumOf { ind -> treasVes[ind] }
         // цикл подбора текущего варианта

@@ -2,6 +2,11 @@
 
 package lesson6.task1
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
 // Рекомендуемое количество баллов = 11
@@ -47,7 +52,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun main() {
+fun _main() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -62,6 +67,19 @@ fun main() {
     }
 }
 
+fun main() {
+
+    println(
+        Regex("""(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})${'$'})""")
+            .matches("MMM")
+    )
+
+//    try {
+//        println(LocalDate.of(2020, 11, 34))
+//    } catch (e: Exception) {
+//        println("Неверная дата")
+//    }
+}
 
 /**
  * Средняя (4 балла)
@@ -114,7 +132,12 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    if (Regex("""[^\d%\-\s]""").containsMatchIn(jumps)) return -1
+    return jumps.splitToSequence(" ").toList().filter { it.toIntOrNull() != null }
+        .map { it.toInt() }.maxOrNull() ?: -1
+}
+
 
 /**
  * Сложная (6 баллов)
@@ -149,7 +172,9 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String) =
+    Regex("""(\S+)\s\1""", RegexOption.IGNORE_CASE).find(str)?.range?.first ?: -1
+
 
 /**
  * Сложная (6 баллов)
@@ -175,7 +200,30 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    if (!Regex("""(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})${'$'})""").matches(
+            roman
+        )
+    ) return -1
+    return Regex("CM|IV|IX|XL|XC|X|I|M|C|V|D|L")
+        .findAll(roman).fold(0, { acc, m ->
+            acc + when (m.value) {
+                "I" -> 1
+                "IV" -> 4
+                "V" -> 5
+                "IX" -> 9
+                "X" -> 10
+                "XL" -> 40
+                "L" -> 50
+                "XC" -> 90
+                "C" -> 100
+                "CD" -> 400
+                "D" -> 500
+                "CM" -> 900
+                else -> 1000
+            }
+        })
+}
 
 /**
  * Очень сложная (7 баллов)
@@ -213,4 +261,51 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    // проверка на неправильные команды
+    if (Regex("""[^>+<\-\[\]\s]""").containsMatchIn(commands)) throw IllegalArgumentException("Unknown commands")
+    // проверка на неправильное количество скобок
+    with(Regex("""[\[\]]""").findAll(commands))
+    {
+        if (fold(0,
+                { acc, e ->
+                    if (acc == 0 && e.value == "]") throw IllegalArgumentException("Missing opening bracket")
+                    acc + if (e.value == "[") 1 else -1
+                }) != 0
+        )
+            throw IllegalArgumentException("Missing closing bracket")
+    }
+    // инициализируем переменные
+    val lst = generateSequence { 0 }.take(cells).toMutableList()
+    var pntLst = cells / 2
+    var pntCmd = 0
+    // запускаем программу
+    for (countCmd in 1..limit) {
+        when (commands[pntCmd]) {
+            '>' -> if (++pntLst !in lst.indices) throw IllegalStateException("Conveyor pointer out of max bound")
+            '<' -> if (--pntLst !in lst.indices) throw IllegalStateException("Conveyor pointer out of min bound")
+            '+' -> lst[pntLst]++
+            '-' -> lst[pntLst]--
+            '[' -> if (lst[pntLst] == 0) {
+                var lvl = 0
+                while (++pntCmd in commands.indices) {
+                    when (commands[pntCmd]) {
+                        '[' -> lvl++
+                        ']' -> if (lvl == 0) break else lvl--
+                    }
+                }
+            }
+            ']' -> if (lst[pntLst] != 0) {
+                var lvl = 0
+                while (--pntCmd in commands.indices) {
+                    when (commands[pntCmd]) {
+                        ']' -> lvl++
+                        '[' -> if (lvl == 0) break else lvl--
+                    }
+                }
+            }
+        }
+        if (++pntCmd > commands.lastIndex) break // конец
+    }
+    return lst
+}
