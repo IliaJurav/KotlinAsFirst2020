@@ -160,7 +160,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>) =
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>) =
-    if (mapB.isEmpty()) mapA else
+    if (mapB.isEmpty()) mapA else if (mapA.isEmpty()) mapB else
         (mapA.map { it.key }.toSet() + mapB.map { it.key }.toSet())
             .map { name ->
                 name to (mapA.getOrDefault(name, "") + "," + mapB.getOrDefault(
@@ -213,12 +213,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String) =
-    chars.isEmpty() && word.isEmpty() ||
-            chars.isNotEmpty() &&
-            !Regex(
-                chars.joinToString(separator = "", prefix = "[^", postfix = "]"),
-                RegexOption.IGNORE_CASE
-            ).containsMatchIn(word)
+    (word.toUpperCase().toSet() - chars.map { it.toUpperCase() }.toSet()).isEmpty()
 
 /**
  * Средняя (4 балла)
@@ -324,15 +319,11 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    with(list.filter {
-        (it * 2 < number) && list.contains(number - it) ||
-                (it * 2 == number) && (list.indexOf(it) != list.lastIndexOf(it))
+    with(list.mapIndexed { index, i -> Pair(index, i) }.filter { (index, it) ->
+        list.contains(number - it) && list.lastIndexOf(number - it) != index
     }) {
-        return when (size) {
-            1 -> Pair(list.indexOf(first()), list.indexOf(number - first()))
-            2 -> Pair(list.indexOf(first()), list.lastIndexOf(first()))
-            else -> Pair(-1, -1)
-        }
+        return if (size < 2) Pair(-1, -1)
+        else Pair(elementAt(0).first, elementAt(1).first)
     }
 }
 
@@ -363,10 +354,10 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // и поместить в List, чтобы иметь доступ по индексам
     val sps = treasures.entries.filter { it.value.first <= capacity }
         .sortedBy { it.value.first }//
-    val treasCost = sps.map{ it.value.second }
-    val treasVes = sps.map{ it.value.first }
     // если ничего не подходит, то и нечего взять
-    if (sps.isEmpty()) return emptySet()
+    if (capacity < 1 || sps.count() == 0) return emptySet()
+    val treasCost = sps.map { it.value.second }
+    val treasVes = sps.map { it.value.first }
     // если всего одна вещь, то её и забираем
     if (sps.size == 1) return setOf(sps[0].key)
     // собственно сумка, как список индексов предметов

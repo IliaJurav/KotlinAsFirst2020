@@ -214,7 +214,14 @@ class Tests {
         )
         assertEquals(
             mapOf("MSFT" to 150.0, "NFLX" to 45.0),
-            averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0, "NFLX" to 50.0))
+            averageStockPrice(
+                listOf(
+                    "MSFT" to 100.0,
+                    "MSFT" to 200.0,
+                    "NFLX" to 40.0,
+                    "NFLX" to 50.0
+                )
+            )
         )
     }
 
@@ -243,6 +250,14 @@ class Tests {
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
         assertTrue(canBuildFrom(listOf(), ""))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
+        assertTrue(
+            canBuildFrom(
+                listOf(
+                    'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
+                    'v', '-', 'a', 'a', 'a', 'a', 'a', 'a'
+                ), "aaaaaaaaa"
+            )
+        )
     }
 
     @Test
@@ -322,7 +337,7 @@ class Tests {
         )
         assertEquals(
             Pair(0, 1),
-            findSumOfTwo(listOf(0, 0), 0)
+            findSumOfTwo(listOf(0, 0, 0, 0), 0)
         )
         assertEquals(
             Pair(-1, -1),
