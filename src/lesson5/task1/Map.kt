@@ -2,6 +2,8 @@
 
 package lesson5.task1
 
+import kotlin.time.seconds
+
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -96,7 +98,9 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *   buildGrades(mapOf("Марат" to 3, "Семён" to 5, "Михаил" to 5))
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
-fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
+fun buildGrades(grades: Map<String, Int>) = grades.values.toSet().sortedBy { -it }
+    .map { ball -> ball to grades.filter { it.value == ball }.keys.toList() }.toMap()
+
 
 /**
  * Простая (2 балла)
@@ -108,7 +112,8 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
+fun containsIn(a: Map<String, String>, b: Map<String, String>) = b == b + a
+
 
 /**
  * Простая (2 балла)
@@ -125,7 +130,7 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
  *     -> a changes to mutableMapOf() aka becomes empty
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
-    TODO()
+    b.forEach { (k, v) -> a.remove(k, v) }
 }
 
 /**
@@ -135,7 +140,8 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * В выходном списке не должно быть повторяюихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
+fun whoAreInBoth(a: List<String>, b: List<String>) =
+    a.toSet().intersect(other = b.toSet()).toList()
 
 /**
  * Средняя (3 балла)
@@ -154,7 +160,16 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
  *     mapOf("Emergency" to "911", "Police" to "02")
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
-fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> = TODO()
+fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>) =
+    (mapA.map { it.key }.toSet() + mapB.map { it.key }.toSet())
+        .map { name ->
+            name to (mapA.getOrDefault(name, "") + "," + mapB.getOrDefault(
+                name,
+                ""
+            )).splitToSequence(',')
+                .filter { it.isNotEmpty() }.toSet().joinToString(separator = ", ")
+        }.toMap()
+
 
 /**
  * Средняя (4 балла)
@@ -166,7 +181,9 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *   averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
-fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> = TODO()
+fun averageStockPrice(stockPrices: List<Pair<String, Double>>) =
+    stockPrices.groupBy { it.first }
+        .map { name -> name.key to name.value.map { it.second }.average() }.toMap()
 
 /**
  * Средняя (4 балла)
@@ -183,7 +200,8 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *     "печенье"
  *   ) -> "Мария"
  */
-fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? = TODO()
+fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? =
+    stuff.filterValues { kind == it.first }.minByOrNull { it.value.second }?.key
 
 /**
  * Средняя (3 балла)
@@ -194,7 +212,14 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
+fun canBuildFrom(chars: List<Char>, word: String) =
+    chars.isNotEmpty() &&
+            !Regex(
+                chars.joinToString(separator = "", prefix = "[^", postfix = "]"),
+                RegexOption.IGNORE_CASE
+            ).containsMatchIn(word)
+
+//    (word.toUpperCase().toSet() - chars.map { it.toUpperCase() }.toSet()).isEmpty()
 
 /**
  * Средняя (4 балла)
@@ -208,7 +233,8 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  * Например:
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
-fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
+fun extractRepeats(list: List<String>): Map<String, Int> =
+    list.groupBy { it }.map { it.key to it.value.count() }.toMap().filter { (_, v) -> v > 1 }
 
 /**
  * Средняя (3 балла)
@@ -222,7 +248,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean = TODO()
+fun hasAnagrams(words: List<String>) =
+    words.map { it.toSet() }.toSet().size < words.size
 
 /**
  * Сложная (5 баллов)
@@ -258,7 +285,20 @@ fun hasAnagrams(words: List<String>): Boolean = TODO()
  *          "GoodGnome" to setOf()
  *        )
  */
-fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
+fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
+    val d = mutableMapOf<String, Set<String>>()
+    for ((name, lst) in friends) {
+        val a = mutableSetOf<String>()
+        for (k in lst) {
+            if (k !in d) d[k] = setOf()
+            if (k in friends) a.addAll(friends.getValue(k))
+            a.add(k)
+        }
+        a.remove(name)
+        d[name] = a
+    }
+    return d
+}
 
 /**
  * Сложная (6 баллов)
@@ -277,7 +317,12 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    with(list.filter { (it * 2 < number) && list.contains(number - it) }) {
+        return if (size > 0) Pair(list.indexOf(first()), list.indexOf(number - first()))
+        else Pair(-1, -1)
+    }
+}
 
 /**
  * Очень сложная (8 баллов)
@@ -300,4 +345,59 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+//fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    // отсортировать предметы сначала самые легкие и только те, что лезут в сумку
+    // и поместить в List, чтобы иметь доступ по индексам
+    val sps = treasures.entries.filter { it.value.first <= capacity }
+        .sortedBy { it.value.first }//
+    // если ничего не подходит, то и нечего взять
+    if (sps.isEmpty()) return emptySet()
+    // если всего одна вещь, то её и забираем
+    if (sps.size == 1) return setOf(sps[0].key)
+    // собственно сумка, как список индексов предметов
+    val bag = mutableListOf<Int>()
+    var maxCost = 0 // максимальная стоимость
+    val rez = mutableSetOf<String>() // лучший по стоимости набор
+    var pnt = 0     // индекс предмета, с которого будем пытаться запихнуть
+    // цикл перебора вариантов предметов
+    while (true) {
+        // рассчитать вес предметов уже находящихся в сумке
+        var ves = bag.sumOf { ind -> sps[ind].value.first }
+        // цикл подбора текущего варианта
+        // пихаем поочереди, пока помещаются
+        for (i in pnt until sps.size)
+            if (ves + sps[i].value.first <= capacity) { // если влазит
+                bag.add(i) // добавляем в сумку
+                ves += sps[i].value.first // корректируем вес
+            } else {
+                // если предмет не лезет, то остальные точно не поместятся
+                // поэтому завершаем формирование варианта
+                break
+            }
+        // не удалось собрать вариант, значит всё, дальше бесполезно
+        if (bag.size == 0) break
+        // считаем стоимость сумки
+        val cost = bag.sumOf { ind -> sps[ind].value.second }
+        //println(pnt.toString() + " " + cost.toString() + " " + bag.joinToString())
+        // если больше чем было, то запомнить стоимость и составить список
+        if (maxCost < cost) {
+            //println("fix")
+            maxCost = cost
+            rez.clear()
+            bag.forEach { rez.add(sps[it].key) }
+        }
+        // если последние вещи без пропусков лежат в сумке,
+        // то это был последний интересующий вариант, остальные только хуже
+        if (bag.size + bag.first() == sps.size) break
+        // готовим новый вариант
+        // если последний предмет в сумке,
+        // то его нужно вынуть без условий, так как за ним нет других предметов
+        if (bag.last() == sps.lastIndex) bag.removeLast()
+        // вынимаем последний добавленный в сумку и новый вариант будем делать
+        // без него, начиная со следующего за ним
+        pnt = bag.last() + 1
+        bag.removeLast()
+    }
+    return rez
+}
