@@ -201,28 +201,15 @@ fun mostExpensive(description: String): String = TODO()
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    if (!Regex("""(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})${'$'})""").matches(
-            roman
-        )
+    if (!Regex("""(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$(?<=[MDCLXVI]))""")
+            .matches(roman)
     ) return -1
-    return Regex("CM|CD|IV|IX|XL|XC|X|I|M|C|V|D|L")
-        .findAll(roman).fold(0, { acc, m ->
-            acc + when (m.value) {
-                "I" -> 1
-                "IV" -> 4
-                "V" -> 5
-                "IX" -> 9
-                "X" -> 10
-                "XL" -> 40
-                "L" -> 50
-                "XC" -> 90
-                "C" -> 100
-                "CD" -> 400
-                "D" -> 500
-                "CM" -> 900
-                else -> 1000
-            }
-        })
+    val digValue = mapOf(
+        "I" to 1, "IV" to 4, "V" to 5, "IX" to 9, "X" to 10, "XL" to 40, "L" to 50,
+        "XC" to 90, "C" to 100, "CD" to 400, "D" to 500, "CM" to 900, "M" to 1000
+    )
+    return Regex("C[M|D]|I[V|X]|X[L|C]|[MDCLXVI]").findAll(roman)
+        .sumOf { digValue.getValue(it.value) }
 }
 
 /**

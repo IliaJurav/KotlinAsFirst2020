@@ -101,11 +101,11 @@ fun sibilants(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
     val r = Regex("""[ЖЧЩШ][ЫЮЯ]""", RegexOption.IGNORE_CASE)
     val subst =
-        mapOf<Char, Char>('Ы' to 'И', 'ы' to 'и', 'Я' to 'А', 'я' to 'а', 'Ю' to 'У', 'ю' to 'у')
+        mapOf('Ы' to 'И', 'ы' to 'и', 'Я' to 'А', 'я' to 'а', 'Ю' to 'У', 'ю' to 'у')
     for (line in File(inputName).readLines()) {
         val rez = line.toMutableList()
-        r.findAll(line).forEach { r ->
-            rez[r.range.last] = subst[line[r.range.last]] ?: '?'
+        r.findAll(line).forEach { m ->
+            rez[m.range.last] = subst[line[m.range.last]] ?: '?'
         }
         writer.write(rez.joinToString(""))
         writer.newLine()

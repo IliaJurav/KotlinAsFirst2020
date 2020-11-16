@@ -163,21 +163,10 @@ fun whoAreInBoth(a: List<String>, b: List<String>) =
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>) =
     (mapA.keys + mapB.keys).map { name ->
         name to
-                if (!mapB.containsKey(name)) mapA.getOrDefault(name, "") else
-                    if (!mapA.containsKey(name)) mapB.getOrDefault(name, "") else
-                        mapA.getOrDefault(name, "") +
-                                with(mapB.getOrDefault(name, "")
-                                    .splitToSequence(", ").toList()
-                                    .filter { phone ->
-                                        phone.trim() !in mapA.getValue(name)
-                                            .splitToSequence(", ").map { it.trim() }.toSet()
-                                    })
-                                {
-                                    if (size > 0) joinToString(
-                                        prefix = ", ",
-                                        separator = ", "
-                                    ) else ""
-                                }
+                ((if (name in mapA) mapA.getValue(name)
+                    .splitToSequence(", ").toSet() else emptySet()) +
+                        (if (name in mapB) mapB.getValue(name)
+                            .splitToSequence(", ").toSet() else emptySet())).joinToString()
     }.toMap()
 
 /**
@@ -327,14 +316,15 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    var a = -1
-    var b = -1
-    list.forEachIndexed { index, value ->
-        if (list.contains(number - value))
-            if (a == -1) a = index else
-                if (b == -1) if (list[a] + value == number) b = index
+    var b = list.lastIndex
+    for (a in 0 until list.lastIndex) {
+        if (list[a] + list[b] == number) {
+            while (b - 1 > a && list[b] == list[b - 1]) b--
+            return Pair(a, b)
+        }
+        while (list[a] + list[b] > number) if (--b == a) break
     }
-    return if (b == -1) Pair(-1, -1) else Pair(a, b)
+    return Pair(-1, -1)
 }
 
 /**
@@ -360,69 +350,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  */
 
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    // отсортировать предметы сначала самые легкие и только те, что лезут в сумку
-    // и поместить в List, чтобы иметь доступ по индексам
-    val sps = treasures.entries.filter { it.value.first in 1..capacity && it.value.second > 0 }
-        .sortedBy { it.value.first }//
-    // если ничего не подходит, то и нечего взять
-    if (capacity < 1 || sps.count() == 0) return emptySet()
-    val treasCost = sps.map { it.value.second }
-    val treasVes = sps.map { it.value.first }
-    // если всего одна вещь, то её и забираем
-    if (sps.size == 1) return setOf(sps[0].key)
-    // собственно сумка, как список индексов предметов
-    val bag = mutableListOf<Int>()
-    var maxCost = 0 // максимальная стоимость
-    val rez = mutableSetOf<Int>() // лучший по стоимости набор
-    var pnt = 0     // индекс предмета, с которого будем пытаться запихнуть
-    var alarm = 0     // индекс предмета, с которого будем пытаться запихнуть
-    val sta = LocalDateTime.now().second
-    println(LocalDateTime.now())
-    // цикл перебора вариантов предметов
-    while (true) {
-        alarm++
-        if ((LocalDateTime.now().second - sta + 60) % 60 > 6) {
-            println(LocalDateTime.now())
-            return rez.map { sps[it].key }.toSet() +
-                    setOf(
-                        "ala=$alarm", "cap=$capacity", "tr=" + treasures.count().toString(),
-                        "sps=" + sps.count().toString()
-                    )
-        }
-        // рассчитать вес предметов уже находящихся в сумке
-        var ves = bag.sumOf { ind -> treasVes[ind] }
-        // цикл подбора текущего варианта
-        // пихаем поочереди, пока помещаются
-        for (i in pnt until sps.size)
-            if (ves + treasVes[i] <= capacity) { // если влазит
-                bag.add(i) // добавляем в сумку
-                ves += treasVes[i] // корректируем вес
-            } else {
-                // если предмет не лезет, то остальные точно не поместятся
-                // поэтому завершаем формирование варианта
-                break
-            }
-        // не удалось собрать вариант, значит всё, дальше бесполезно
-        if (bag.size == 0) break
-        // считаем стоимость сумки
-        val cost = bag.sumOf { ind -> treasCost[ind] }
-        // если больше чем было, то запомнить стоимость и составить список
-        if (maxCost < cost) {
-            maxCost = cost
-            rez.clear()
-            rez.addAll(bag)
-        }
-        // если последние вещи без пропусков лежат в сумке,
-        // то это был последний интересующий вариант, остальные только хуже
-        if (bag.size + bag.first() == sps.size) break
-        // готовим новый вариант
-        // если последний предмет в сумке,
-        // то его нужно вынуть без условий, так как за ним нет других предметов
-        if (bag.last() == sps.lastIndex) bag.removeLast()
-        // вынимаем последний добавленный в сумку и новый вариант будем делать
-        // без него, начиная со следующего за ним
-        pnt = bag.last() + 1
-        bag.removeLast()
-    }
-    return rez.map { sps[it].key }.toSet()
+    return setOf(
+        "cap=$capacity, tr_size=${treasures.count()}"
+    )
 }
