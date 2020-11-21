@@ -348,28 +348,29 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val curRow = mutableListOf<Triple<Int, Int, Set<String>>>()
-    val prevRow = mutableListOf(Triple(0, 0, emptySet<String>()))
+    if (treasures.values.sumOf { it.first } <= capacity) return treasures.keys
+    val curBags = mutableListOf<Triple<Int, Int, Set<String>>>()
+    val prevBags = mutableListOf(Triple(0, 0, emptySet<String>()))
     treasures.forEach { name, (weight, cost) ->
-        prevRow.forEach { (load, total, set) ->
+        prevBags.forEach addItem@{ (load, total, set) ->
             if (load + weight <= capacity)
-                curRow.add(Triple(load + weight, total + cost, set + name))
+                curBags.add(Triple(load + weight, total + cost, set + name))
+            else return@addItem // нет смысла продолжать
         }
-        curRow.addAll(prevRow)
-        curRow.sortBy { it.first }
+        curBags.addAll(prevBags)
+        curBags.sortBy { it.first }
+        prevBags.clear()
         var maxTotal = -1
-        val filteredRow = curRow.filter { (_, total, _) ->
+        prevBags.addAll(curBags.filter { (_, total, _) ->
             if (maxTotal >= total) {
                 false
             } else {
-                maxTotal = total;true
+                maxTotal = total
+                true
             }
-        }
-        prevRow.clear()
-        prevRow.addAll(filteredRow)
-        curRow.clear()
+        })
+        curBags.clear()
     }
-    return prevRow.last().third
+    return prevBags.last().third
 }

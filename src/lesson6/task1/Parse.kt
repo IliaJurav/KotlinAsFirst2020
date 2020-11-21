@@ -67,19 +67,19 @@ fun _main() {
     }
 }
 
-fun main() {
-
-    println(
-        Regex("""(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})${'$'})""")
-            .matches("MMM")
-    )
+//fun main() {
+//
+//    println(
+//        Regex("""(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})${'$'})""")
+//            .matches("MMM")
+//    )
 
 //    try {
 //        println(LocalDate.of(2020, 11, 34))
 //    } catch (e: Exception) {
 //        println("Неверная дата")
 //    }
-}
+//}
 
 /**
  * Средняя (4 балла)
@@ -120,7 +120,14 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String) =
+    if (Regex("""(\(\D*\))|[^\d\+\-\s\(\)]|(\).*[\(\)])|(\(.*\+)|(\S+.*\+)""").containsMatchIn(phone)) ""
+    else Regex("""[^\d\+]""").replace(phone, "")
+
+
+fun main() {
+    println(flattenPhoneNumber("12 --  34- 5 -- 67 -89"))
+}
 
 /**
  * Средняя (5 баллов)
