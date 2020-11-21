@@ -2,6 +2,8 @@
 
 package lesson5.task1
 
+import java.lang.Integer.max
+import java.lang.Integer.min
 import java.time.LocalDateTime
 import kotlin.time.seconds
 
@@ -319,9 +321,14 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     val mList = list.mapIndexed { index, it -> it to index }.toList().sortedBy { it.first }
     var b = list.lastIndex
     for (a in 0 until mList.lastIndex) {
-        while (mList[a].first + mList[b].first >= number) if (--b <= a) break
-        if (++b > mList.lastIndex) break
-        if (mList[a].first + mList[b].first == number) return Pair(mList[a].second, mList[b].second)
+        while (mList[a].first + mList[b].first > number) if (--b <= a) return Pair(-1, -1)
+        if (mList[a].first + mList[b].first == number) {
+            while ((b - 1) > a && mList[a].first + mList[b - 1].first == number) b--
+            return Pair(
+                min(mList[a].second, mList[b].second),
+                max(mList[a].second, mList[b].second)
+            )
+        }
     }
     return Pair(-1, -1)
 }
