@@ -124,11 +124,6 @@ fun flattenPhoneNumber(phone: String) =
     if (Regex("""(\(\D*\))|[^\d\+\-\s\(\)]|(\).*[\(\)])|(\(.*\+)|(\S+.*\+)""").containsMatchIn(phone)) ""
     else Regex("""[^\d\+]""").replace(phone, "")
 
-
-fun main() {
-    println(flattenPhoneNumber("12 --  34- 5 -- 67 -89"))
-}
-
 /**
  * Средняя (5 баллов)
  *

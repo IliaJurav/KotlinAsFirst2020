@@ -164,11 +164,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>) =
  */
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>) =
     (mapA.keys + mapB.keys).map { name ->
-        name to
-                ((if (name in mapA) mapA.getValue(name)
-                    .splitToSequence(", ").toSet() else emptySet()) +
-                        (if (name in mapB) mapB.getValue(name)
-                            .splitToSequence(", ").toSet() else emptySet())).joinToString()
+        name to setOf(mapA[name], mapB[name]).filterNotNull().joinToString(", ")
     }.toMap()
 
 /**
@@ -318,16 +314,12 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val mList = list.mapIndexed { index, it -> it to index }.toList().sortedBy { it.first }
-    var b = list.lastIndex
-    for (a in 0 until mList.lastIndex) {
-        while (mList[a].first + mList[b].first > number) if (--b <= a) return Pair(-1, -1)
-        if (mList[a].first + mList[b].first == number) {
-            while ((b - 1) > a && mList[a].first + mList[b - 1].first == number) b--
-            return Pair(
-                min(mList[a].second, mList[b].second),
-                max(mList[a].second, mList[b].second)
-            )
+    val setForSearch = list.toSet()
+    for (a in setForSearch) {
+        if (setForSearch.contains(number - a)) {
+            val min = list.indexOf(a)
+            val max = list.subList(min + 1, list.size).indexOf(number - a)
+            if (max >= 0) return Pair(min, max + min + 1)
         }
     }
     return Pair(-1, -1)
