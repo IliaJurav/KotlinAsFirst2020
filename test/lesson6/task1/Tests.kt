@@ -88,6 +88,8 @@ class Tests {
         assertEquals(226, bestHighJump("226 +"))
         assertEquals(-1, bestHighJump("???"))
         assertEquals(230, bestHighJump("220 + 224 %+ 228 %- 230 + 232 %%- 234 %"))
+        assertEquals(-1, bestHighJump("220 + 224 %+ 228 %- 230 + 232 %%- 234 345 %"))
+        assertEquals(-1, bestHighJump("220 ++ 224 %+ 228 %- 230 + 232 %%- 345 %"))
     }
 
     @Test
@@ -98,6 +100,7 @@ class Tests {
         assertEquals(6, plusMinus("2 + 31 - 40 + 13"))
         assertEquals(-1, plusMinus("0 - 1"))
         assertThrows(IllegalArgumentException::class.java) { plusMinus("+2") }
+        assertThrows(IllegalArgumentException::class.java) { plusMinus("2 +") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("+ 4") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("4 - -2") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("44 - - 12") }
@@ -119,6 +122,7 @@ class Tests {
         assertEquals("", mostExpensive(""))
         assertEquals("Курица", mostExpensive("Хлеб 39.9; Молоко 62.5; Курица 184.0; Конфеты 89.9"))
         assertEquals("Вино", mostExpensive("Вино 255.0"))
+        assertEquals("", mostExpensive("Вино aa 255.0"))
     }
 
     @Test

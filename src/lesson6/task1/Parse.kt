@@ -67,20 +67,6 @@ fun _main() {
     }
 }
 
-//fun main() {
-//
-//    println(
-//        Regex("""(^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})${'$'})""")
-//            .matches("MMM")
-//    )
-
-//    try {
-//        println(LocalDate.of(2020, 11, 34))
-//    } catch (e: Exception) {
-//        println("Неверная дата")
-//    }
-//}
-
 /**
  * Средняя (4 балла)
  *
@@ -152,7 +138,10 @@ fun bestLongJump(jumps: String): Int {
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    if (Regex("""[^\d%\-\+\s]|(\d+\s+\d)|([\+\-]\D*[\+\-])""").containsMatchIn(jumps)) return -1
+    return Regex("""\d+(?=[\s\%]*\+)""").findAll(jumps).map { it.value.toInt() }.maxOrNull() ?: -1
+}
 
 /**
  * Сложная (6 баллов)
@@ -163,7 +152,15 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    if (Regex("""(^\+)|[^\d\-\+\s]|(\d+\s+\d)|([\+\-]\D*[\+\-])|${'$'}(?<=[\-\+])""").containsMatchIn(
+            expression.trim()
+        )
+    )
+        throw IllegalArgumentException("Error")
+    val s = Regex("""\s+""").replace(expression, "")
+    return Regex("""\-?\d+""").findAll(s).map { it.value.toInt() }.sum()
+}
 
 /**
  * Сложная (6 баллов)
@@ -189,7 +186,14 @@ fun firstDuplicateIndex(str: String) =
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше нуля либо равны нулю.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    if (description == "") return ""
+    if (Regex("""\S+\s\d+\.?\d*;?\s?""").replace(description, "") != "") return ""
+    return description.split("; ")
+        .map { with(it.split(" ")) { first() to last().toDouble() } }
+        .maxByOrNull { it.second }?.first ?: ""
+
+}
 
 /**
  * Сложная (6 баллов)
