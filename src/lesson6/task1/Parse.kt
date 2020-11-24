@@ -52,7 +52,7 @@ fun timeSecondsToStr(seconds: Int): String {
 /**
  * Пример: консольный ввод
  */
-fun _main() {
+fun main() {
     println("Введите время в формате ЧЧ:ММ:СС")
     val line = readLine()
     if (line != null) {
@@ -155,9 +155,10 @@ fun bestHighJump(jumps: String): Int {
 fun plusMinus(expression: String): Int {
     if (Regex("""(^\+)|[^\d\-\+\s]|(\d+\s+\d)|([\+\-]\D*[\+\-])|${'$'}(?<=[\-\+])""").containsMatchIn(
             expression.trim()
-        )
+        ) || expression == ""
     )
         throw IllegalArgumentException("Error")
+
     val s = Regex("""\s+""").replace(expression, "")
     return Regex("""\-?\d+""").findAll(s).map { it.value.toInt() }.sum()
 }
