@@ -89,7 +89,7 @@ fun dateStrToDigit(str: String): String {
     val day = a[0].toInt()
     val month = m.indexOf(a[1]) + 1
     if (month == 0 ||
-        year !in 0..2200 ||
+        year !in 0..10000 ||
         day !in 1..LocalDate.of(year, month, 1).lengthOfMonth()
     ) return ""
     return "%02d.%02d.%d".format(day, month, year)
@@ -116,7 +116,7 @@ fun dateDigitToStr(digital: String): String {
     val day = a[0].toInt()
     val month = a[1].toInt()
     if (month !in 1..12 ||
-        year !in 0..2200 ||
+        year !in 0..10000 ||
         day !in 1..LocalDate.of(year, month, 1).lengthOfMonth()
     ) return ""
     return "%d %s %d".format(day, m[month - 1], year)
