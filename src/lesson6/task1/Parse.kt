@@ -78,7 +78,22 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val m = listOf(
+        "января", "февраля", "марта", "апреля", "мая",
+        "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    )
+    if (!Regex("""(^(?=\d)(\d+\s\S+\s\d+)${'$'}(?<=\d))""").containsMatchIn(str)) return ""
+    val a = str.split(" ")
+    val year = a[2].toInt()
+    val day = a[0].toInt()
+    val month = m.indexOf(a[1]) + 1
+    if (month == 0 ||
+        year !in 1700..2200 ||
+        day !in 1..LocalDate.of(year, month, 1).lengthOfMonth()
+    ) return ""
+    return "%02d.%02d.%d".format(day, month, year)
+}
 
 /**
  * Средняя (4 балла)
@@ -90,7 +105,22 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val m = listOf(
+        "января", "февраля", "марта", "апреля", "мая",
+        "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    )
+    if (!Regex("""(^(?=\d)(\d+\.\d+\.\d+)${'$'}(?<=\d))""").containsMatchIn(digital)) return ""
+    val a = digital.split(".")
+    val year = a[2].toInt()
+    val day = a[0].toInt()
+    val month = a[1].toInt()
+    if (month !in 1..12 ||
+        year !in 1700..2200 ||
+        day !in 1..LocalDate.of(year, month, 1).lengthOfMonth()
+    ) return ""
+    return "%d %s %d".format(day, m[month - 1], year)
+}
 
 /**
  * Средняя (4 балла)
