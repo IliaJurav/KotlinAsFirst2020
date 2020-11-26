@@ -184,7 +184,7 @@ fun bestHighJump(jumps: String): Int {
 fun plusMinus(expression: String): Int {
     if (Regex("""(^\+)|[^\d\-\+\s]|(\d+\s+\d)|([\+\-]\D*[\+\-])|${'$'}(?<=[\-\+])""").containsMatchIn(
             expression.trim()
-        ) || expression == ""
+        ) || expression.trim() == ""
     )
         throw IllegalArgumentException("Error")
 
