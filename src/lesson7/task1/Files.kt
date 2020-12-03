@@ -63,13 +63,14 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    val writer = File(outputName).bufferedWriter()
-    for (line in File(inputName).readLines()) {
-        if (line.isNotEmpty() && line.first() == '_') continue
-        writer.write(line)
-        writer.newLine()
+    File(outputName).bufferedWriter().use { wr ->
+        File(inputName).forEachLine { line ->
+            if (line.isEmpty() || line.first() != '_') {
+                wr.write(line)
+                wr.newLine()
+            }
+        }
     }
-    writer.close()
 }
 
 /**
@@ -98,19 +99,14 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    val writer = File(outputName).bufferedWriter()
-    val r = Regex("""[ЖЧЩШ][ЫЮЯ]""", RegexOption.IGNORE_CASE)
-    val subst =
-        mapOf('Ы' to 'И', 'ы' to 'и', 'Я' to 'А', 'я' to 'а', 'Ю' to 'У', 'ю' to 'у')
-    for (line in File(inputName).readLines()) {
-        val rez = line.toMutableList()
-        r.findAll(line).forEach { m ->
-            rez[m.range.last] = subst[line[m.range.last]] ?: '?'
+    val reg = Regex("(?<=[ЖЧЩШ])[ЫЮЯ]", RegexOption.IGNORE_CASE)
+    val subst = mapOf("Ы" to "И", "ы" to "и", "Я" to "А", "я" to "а", "Ю" to "У", "ю" to "у")
+    File(outputName).bufferedWriter().use { out ->
+        File(inputName).forEachLine { line ->
+            out.write(reg.replace(line) { m -> subst.getValue(m.value) })
+            out.newLine()
         }
-        writer.write(rez.joinToString(""))
-        writer.newLine()
     }
-    writer.close()
 }
 
 /**
@@ -131,7 +127,15 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val txt = File(inputName).readLines().map { it.trim() }
+    val maxLen = txt.maxOfOrNull { it.length } ?: 0
+    File(outputName).bufferedWriter().use { out ->
+        txt.forEach { line ->
+            out.write(line.padStart((maxLen + line.length) / 2))
+            //out.write(("%${(maxLen + line.length) / 2}s".format(line)))
+            out.newLine()
+        }
+    }
 }
 
 /**
