@@ -189,7 +189,22 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val a = mutableListOf<String>()
+    val rg = Regex("""[а-яa-zё]+""")
+    var f = 0
+    File(inputName).forEachLine { a.addAll(rg.findAll(it.toLowerCase()).map { it.value }) }
+    return a.groupBy { it }.map { it.key to it.value.count() }.sortedBy { -it.second }
+        .filterIndexed { index, it ->
+            when (index) {
+                in 0..18 -> true
+                19 -> {
+                    f = it.second; true
+                }
+                else -> it.second == f
+            }
+        }.toMap()
+}
 
 /**
  * Средняя (14 баллов)
@@ -255,7 +270,11 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use { wr ->
+        val a = File(inputName).readLines().map { it to it.toUpperCase().toSet().size }
+        val max = a.maxOfOrNull { it.second } ?: 0
+        wr.write(a.filter { it.second == max }.map { it.first }.joinToString())
+    }
 }
 
 /**
