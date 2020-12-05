@@ -246,7 +246,7 @@ fun top20Words(inputName: String): Map<String, Int> {
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
     val s = if (dictionary.isNotEmpty()) dictionary.keys.joinToString("") else " "
-    val reg = Regex("[\\Q$s\\E]", RegexOption.IGNORE_CASE)
+    val reg = Regex("[${Regex.escape(s)}]", RegexOption.IGNORE_CASE)
     val dic =
         if (dictionary.isNotEmpty()) dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }
             .toMap() else mapOf(' ' to " ")
