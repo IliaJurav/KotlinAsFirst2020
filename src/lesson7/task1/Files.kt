@@ -193,7 +193,10 @@ fun top20Words(inputName: String): Map<String, Int> {
     val a = mutableListOf<String>()
     val rg = Regex("""[а-яa-zё]+""")
     var f = 0
-    File(inputName).forEachLine { a.addAll(rg.findAll(it.toLowerCase()).map { it.value }) }
+    File(inputName).forEachLine { line ->
+        a.addAll(
+            rg.findAll(line.toLowerCase()).map { it.value })
+    }
     return a.groupBy { it }.map { it.key to it.value.count() }.sortedBy { -it.second }
         .filterIndexed { index, it ->
             when (index) {
@@ -242,8 +245,22 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    val s = dictionary.keys.joinToString("")
+    val reg = Regex("[\\Q$s\\E]", RegexOption.IGNORE_CASE)
+    val dic = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
+    File(outputName).bufferedWriter().use { out ->
+        File(inputName).forEachLine { line ->
+            val s = reg.replace(line) { m ->
+                val sb = dic.getValue(m.value.first().toLowerCase())
+                if (m.value.first().isUpperCase()) sb.capitalize()
+                else sb
+            }
+            out.write(s)
+            out.newLine()
+        }
+    }
 }
+
 
 /**
  * Средняя (12 баллов)
