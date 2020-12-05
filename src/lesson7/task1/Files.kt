@@ -245,9 +245,11 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    val s = dictionary.keys.joinToString("")
+    val s = if (dictionary.isNotEmpty()) dictionary.keys.joinToString("") else " "
     val reg = Regex("[\\Q$s\\E]", RegexOption.IGNORE_CASE)
-    val dic = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }.toMap()
+    val dic =
+        if (dictionary.isNotEmpty()) dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }
+            .toMap() else mapOf(' ' to " ")
     File(outputName).bufferedWriter().use { out ->
         File(inputName).forEachLine { line ->
             val s = reg.replace(line) { m ->
