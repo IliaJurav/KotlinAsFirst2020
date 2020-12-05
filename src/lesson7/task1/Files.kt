@@ -246,23 +246,18 @@ fun top20Words(inputName: String): Map<String, Int> {
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
     val s = if (dictionary.isNotEmpty()) dictionary.keys.joinToString("") else " "
-    val reg = Regex("[${Regex.escape(s)}]", RegexOption.IGNORE_CASE)
+    val reg = Regex("[${Regex.escape(s)}]", setOf(RegexOption.IGNORE_CASE, RegexOption.UNIX_LINES))
     val dic =
         if (dictionary.isNotEmpty()) dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }
             .toMap() else mapOf(' ' to " ")
     File(outputName).bufferedWriter().use { out ->
-        File(inputName).forEachLine { line ->
-            val s = reg.replace(line) { m ->
-                val sb = dic.getValue(m.value.first().toLowerCase())
-                if (m.value.first().isUpperCase()) sb.capitalize()
-                else sb
-            }
-            out.write(s)
-            out.newLine()
-        }
+        out.write(reg.replace(File(inputName).reader().use { it.readText() }) { m ->
+            val sb = dic.getValue(m.value.first().toLowerCase())
+            if (m.value.first().isUpperCase()) sb.capitalize()
+            else sb
+        })
     }
 }
-
 
 /**
  * Средняя (12 баллов)

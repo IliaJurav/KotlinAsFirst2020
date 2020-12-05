@@ -228,6 +228,13 @@ Basic, Ruby, Swift.
         )
         assertFileContent("temp.txt", "Здравствуй,\nмир!")
         File("temp.txt").delete()
+        transliterate(
+            "input/trans_in1.txt",
+            mapOf('\n' to "h"),
+            "temp.txt"
+        )
+        assertFileContent("temp.txt", "Здравствуй,\nhмир!")
+        File("temp.txt").delete()
     }
 
     @Test
