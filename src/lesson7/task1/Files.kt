@@ -345,7 +345,63 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    val stack = mutableListOf<String>()
+    File(outputName).bufferedWriter().use { out ->
+        val addTag = { tag: String ->
+            if (tag in stack) {
+                while (tag in stack) {
+                    out.write("</${stack.last()}>")
+                    stack.removeLast()
+                }
+            }
+            stack.add(tag)
+            out.write("<$tag>")
+        }
+        val freeTag = { ->
+            stack.reversed().forEach {
+                out.write("</$it>")
+            }
+        }
+        val chkTag = { tag: String ->
+            if (tag in stack) {
+                while (stack.last() != tag) {
+                    out.write("</${stack.last()}>")
+                    stack.removeLast()
+                }
+                stack.removeLast()
+                "</$tag>"
+            } else {
+                stack.add(tag)
+                "<$tag>"
+            }
+        }
+        val regMain = Regex("""~~|\*{1,3}""")
+        val regEmpty = Regex("""\S+""")
+        addTag("html")
+        addTag("body")
+        addTag("p")
+        for (line in File(inputName).readLines()) {
+            if (!regEmpty.containsMatchIn(line)) {
+                addTag("p")
+                continue
+            }
+            out.write(regMain.replace(line) { m ->
+                when (m.value) {
+                    "~~" -> chkTag("s")
+                    "***" -> with(stack)
+                    {
+                        if (indexOf("i") > indexOf("b")) chkTag("i") + chkTag("b")
+                        else chkTag("b") + chkTag("i")
+                    }
+                    "**" -> chkTag("b")
+                    "*" -> chkTag("i")
+                    else -> "?"
+                }
+            })
+            out.newLine()
+        }
+        freeTag()
+    }
 }
 
 /**
