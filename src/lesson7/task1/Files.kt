@@ -377,8 +377,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         val regMain = Regex("""~~|\*{1,3}""")
         addTag("html")
         addTag("body")
-        addTag("p")
-        var newBlk = false
+        var newBlk = true
         File(inputName).forEachLine { line ->
             if (line.isBlank()) {
                 newBlk = true
@@ -401,6 +400,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 out.newLine()
             }
         }
+        out.write(chkTag("p"))
         freeTag()
     }
 }
