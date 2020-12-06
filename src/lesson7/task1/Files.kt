@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.lang.Integer.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -567,6 +568,54 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use { out ->
+        // размер области деления
+        val mainSz = "$lhv".length + 1
+        // расчёт маски для выделения нужной части делимого
+        var msk = ("1" + "0".repeat(mainSz - 2)).toInt()
+        // делимое будет уменьшаться
+        var dividend = lhv
+        // правый край при отображении
+        var edge = 1
+        // вывод первой строки
+        out.write("%${mainSz}d | %d".format(lhv, rhv))
+        out.newLine()
+        // поиск первого шага
+        while (msk > 1 && dividend / msk < rhv) {
+            edge++
+            msk /= 10
+        }
+        while (msk > 0) {
+            edge++
+            // расчёт цифры частного на данном шаге
+            val s = dividend / msk / rhv
+            // расчёт уменьшаемого
+            val s1 = if (dividend != lhv) "%02d".format(dividend / msk) else ""
+            // первый раз уменьшаемое не отображаем
+            if (dividend != lhv) {
+                out.write(s1.padStart(edge))
+                out.newLine()
+            }
+            // расчёт вычитаемого
+            val s2 = "-${s * rhv}"
+            // на первом шаге дополнительно идёт вывод частного
+            if (dividend != lhv)
+                out.write(s2.padStart(edge))
+            else
+                out.write(s2.padStart(edge).padEnd(mainSz + 3) + (lhv / rhv).toString())
+            out.newLine()
+            // подчёркиваем
+            if (dividend != lhv)
+                out.write("-".repeat(max(s1.length, s2.length)).padStart(edge))
+            else
+                out.write("-".repeat(max(edge - 1, s2.length)).padStart(edge))
+            out.newLine()
+            // подготовка к следующему шагу
+            dividend -= s * rhv * msk
+            msk /= 10
+        }
+        // выводим остаток деления чисел
+        out.write("$dividend".padStart(edge))
+    }
 }
 
