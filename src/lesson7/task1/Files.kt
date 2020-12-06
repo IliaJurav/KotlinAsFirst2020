@@ -349,12 +349,10 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use { out ->
         val addTag = { tag: String ->
             if (tag in stack) {
-                while (tag in stack) {
-                    out.write("</${stack.last()}>")
-                    stack.removeLast()
-                }
+                out.write("</$tag>")
+            } else {
+                stack.add(tag)
             }
-            stack.add(tag)
             out.write("<$tag>")
         }
         val freeTag = { ->
@@ -376,29 +374,30 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             }
         }
         val regMain = Regex("""~~|\*{1,3}""")
-        val regEmpty = Regex("""\S+""")
         addTag("html")
         addTag("body")
-        addTag("p")
-        for (line in File(inputName).readLines()) {
-            if (!regEmpty.containsMatchIn(line)) {
-                addTag("p")
-                continue
-            }
-            out.write(regMain.replace(line) { m ->
-                when (m.value) {
-                    "~~" -> chkTag("s")
-                    "***" -> with(stack)
-                    {
-                        if (indexOf("i") > indexOf("b")) chkTag("i") + chkTag("b")
-                        else chkTag("b") + chkTag("i")
+        var newBlk = true
+        File(inputName).forEachLine { line ->
+            if (line.isBlank()) {
+                newBlk = true
+            } else {
+                if (newBlk) addTag("p")
+                newBlk = false
+                out.write(regMain.replace(line) { m ->
+                    when (m.value) {
+                        "~~" -> chkTag("s")
+                        "***" -> with(stack)
+                        {
+                            if (indexOf("i") > indexOf("b")) chkTag("i") + chkTag("b")
+                            else chkTag("b") + chkTag("i")
+                        }
+                        "**" -> chkTag("b")
+                        "*" -> chkTag("i")
+                        else -> "?"
                     }
-                    "**" -> chkTag("b")
-                    "*" -> chkTag("i")
-                    else -> "?"
-                }
-            })
-            out.newLine()
+                })
+                out.newLine()
+            }
         }
         freeTag()
     }
