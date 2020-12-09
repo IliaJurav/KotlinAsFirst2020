@@ -254,11 +254,17 @@ fun top20Words(inputName: String): Map<String, Int> {
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    val s = if (dictionary.isNotEmpty()) dictionary.keys.joinToString("") else " "
-    val reg = Regex("[${Regex.escape(s)}]", setOf(RegexOption.IGNORE_CASE, RegexOption.UNIX_LINES))
-    val dic =
-        if (dictionary.isNotEmpty()) dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }
-            .toMap() else mapOf(' ' to " ")
+    if (dictionary.isEmpty()) {
+        File(inputName).copyTo(File(outputName), overwrite = true)
+        return
+    }
+    val s = dictionary.keys.joinToString("")
+    val reg = Regex(
+        "[${Regex.escape(s)}]",
+        setOf(RegexOption.IGNORE_CASE, RegexOption.UNIX_LINES)
+    )
+    val dic = dictionary.map { it.key.toLowerCase() to it.value.toLowerCase() }
+        .toMap()
     File(outputName).bufferedWriter().use { out ->
         out.write(reg.replace(File(inputName).reader().use { it.readText() }) { m ->
             val sb = dic.getValue(m.value.first().toLowerCase())
@@ -394,7 +400,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                         }
                         "**" -> chkTag("b")
                         "*" -> chkTag("i")
-                        else -> "?"
+                        else -> throw IllegalArgumentException("Regex extra char is \"${m.value}\"")
                     }
                 })
                 out.newLine()
