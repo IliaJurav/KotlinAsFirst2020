@@ -23,6 +23,7 @@ internal class PhoneBookTest {
         assertTrue(book.addHuman("Иванов Петр"))
         assertTrue(book.addHuman("Васильев Дмитрий"))
         assertTrue(book.removeHuman("Иванов Петр"))
+        assertFalse(book.removeHuman("Иванов Петр"))
         assertFalse(book.removeHuman("Сидорова Мария"))
     }
 

@@ -1,5 +1,6 @@
 package lesson5.task1
 
+import lesson6.task1.plusMinus
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -367,4 +368,31 @@ class Tests {
             )
         )
     }
+
+
+// тест для теста
+
+    @Test
+    @Tag("Test")
+    fun costParty() {
+        assertEquals(
+            14, costParty(listOf("Даниил+два", "Катя+десять"), 1)
+        )
+        assertEquals(
+            150, costParty(listOf("Петя", "Даниил+ ДВА", "Катя+десять"), 10)
+        )
+        assertEquals(
+            0, costParty(listOf(), 10)
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            costParty(
+                listOf(
+                    "Петя",
+                    "Даниил+двадцать",
+                    "Катя+десять"
+                ), 10
+            )
+        }
+    }
+
 }

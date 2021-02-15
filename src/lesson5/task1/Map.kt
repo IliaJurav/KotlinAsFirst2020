@@ -2,11 +2,6 @@
 
 package lesson5.task1
 
-import java.lang.Integer.max
-import java.lang.Integer.min
-import java.time.LocalDateTime
-import kotlin.time.seconds
-
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -372,3 +367,69 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     }
     return prevBags.last().third
 }
+
+
+/**
+ * Валентин и Настя женятся! Они отослали всем друзьям приглашения
+ * на свадьбу. На каждом приглашении можно отметить +num,
+ * где num - количество родственников, которые придут с
+ * приглашенным человеком.
+ *
+ * К сожалению, Валентин и Настя не знают арабских и римских чисел,
+ * и поэтому просят гостей писать количество родственников прописью.
+ * При этом количество родственников не может быть больше 10.
+ * Список отметок на приглашениях указан параметром marks,
+ * например listOf("Даниил+два", "Катя+десять")
+ *
+ * Сколько же потратит молодая пара на праздничный обед, если
+ * обслуживание одного человека указано параметром cost?
+ *
+ * Пример входных данных: listOf("Даниил+два", "Катя+десять")
+ *
+ * Имя функции и тип результата функции предложить
+ * самостоятельно; в задании указан тип Any.
+ *
+ * При нарушении формата входной строки
+ * бросить IllegalArgumentException
+ *
+ * Кроме функции, следует написать тесты,
+ * подтверждающие её работоспособность.
+ */
+fun costParty(marks: List<String>, cost: Int): Int {
+    var total = 0
+    val num = mapOf(
+        "ноль" to 0,
+        "один" to 1,
+        "два" to 2,
+        "три" to 3,
+        "четыре" to 4,
+        "пять" to 5,
+        "шесть" to 6,
+        "семь" to 7,
+        "восемь" to 8,
+        "девять" to 9,
+        "десять" to 10
+    )
+    marks.forEach {
+        if ('+' !in it) {
+            total += cost
+        } else
+            with(it.split("+")) {
+                if (count() != 2) throw IllegalArgumentException()
+                val numStr = this[1].trim().toLowerCase()
+                if (numStr in num) {
+                    total += cost + cost * num.getValue(numStr)
+                } else {
+                    throw IllegalArgumentException()
+                }
+            }
+    }
+    return total
+}
+
+
+fun main() {
+//    val a = myTest.costParty(listOf("Даниил+два", "Катя+десять"), 1)
+//    println(a)
+}
+

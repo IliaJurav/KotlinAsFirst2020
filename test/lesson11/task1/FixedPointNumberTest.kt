@@ -52,7 +52,7 @@ class FixedPointNumberTest {
     fun div() {
         val x = FixedPointNumber("2.345")
         val y = FixedPointNumber("19.7532")
-        assertEquals(FixedPointNumber("8.424"), y / x)
+        assertEquals(FixedPointNumber("8.4235"), y / x)
     }
 
     @Test
@@ -85,6 +85,7 @@ class FixedPointNumberTest {
     fun testToString() {
         val x = FixedPointNumber(19.7532, 4)
         assertEquals("19.7532", x.toString())
+        assertEquals("-19.7532", (-x).toString())
     }
 
     @Test
