@@ -262,15 +262,18 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
  * построить окружность, описанную вокруг треугольника - эквивалентная задача).
  */
 fun circleByThreePoints(a: Point, b: Point, c: Point): Circle {
-    val distAB = a.distance(b)
-    val distAC = a.distance(c)
-    val distBC = b.distance(c)
-    val cen = if (distAB < distAC && distAB < distBC)
-        bisectorByPoints(a, c).crossPoint(bisectorByPoints(b, c))
-    else if (distAC < distAB && distAC < distBC)
-        bisectorByPoints(a, b).crossPoint(bisectorByPoints(b, c))
-    else bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c))
-    return Circle(cen, max(cen.distance(a), max(cen.distance(b), cen.distance(c))))
+    val cAB = with(bisectorByPoints(a, c).crossPoint(bisectorByPoints(b, c))) {
+        Circle(this, max(this.distance(a), max(this.distance(b), this.distance(c))))
+    }
+    val cAC = with(bisectorByPoints(a, b).crossPoint(bisectorByPoints(b, c))) {
+        Circle(this, max(this.distance(a), max(this.distance(b), this.distance(c))))
+    }
+    val cBC = with(bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c))) {
+        Circle(this, max(this.distance(a), max(this.distance(b), this.distance(c))))
+    }
+    return if (cAB.radius < cAC.radius && cAB.radius < cBC.radius) cAB else
+        if (cAC.radius < cAB.radius && cAC.radius < cBC.radius) cAC else
+            cBC
 }
 
 
@@ -290,7 +293,6 @@ fun minContainingCircle(vararg points: Point): Circle {
         0 -> throw IllegalArgumentException("No points")
         1 -> return Circle(points[0], 0.0)
         2 -> return circleByDiameter(Segment(points[0], points[1]))
-        3 -> return circleByThreePoints(points[0], points[1], points[2])
     }
     val dia = diameter(*points)
     var cr = circleByDiameter(dia)

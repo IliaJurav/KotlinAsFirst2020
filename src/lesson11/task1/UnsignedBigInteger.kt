@@ -21,7 +21,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      */
     constructor(s: String) {
         if (!Regex("""\d+""").matches(s)) throw IllegalArgumentException("Illegal char")
-        s.reversed().mapTo(digit){it - '0'}
+        s.reversed().mapTo(digit) { it - '0' }
     }
 
     /**
@@ -30,14 +30,20 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
     constructor(i: Int) {
         if (i < 0) throw IllegalArgumentException("Illegal value")
         digit.add(i)
-        norm()
+        normalize()
     }
 
+    /**
+     * Конструктор из UnsignedBigInteger
+     */
     constructor(k: UnsignedBigInteger?) {
         if (k is UnsignedBigInteger) digit.addAll(k.digit)
     }
 
-    private fun norm(): Boolean {
+    /**
+     * Нормализация представления -> каждый элемент in 0..9
+     */
+    private fun normalize(): Boolean {
         var i = 0
         var over = 0
         do {
@@ -59,7 +65,10 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
         return true
     }
 
-    private fun trim() {
+    /**
+     * Удаление лидирующих незначащих нулей
+     */
+    private fun trimToSize() {
         for (i in digit.lastIndex downTo 1)
             if (digit[i] == 0) digit.removeAt(i)
             else break
@@ -75,7 +84,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
             (if (i < digit.size) digit[i] else 0) +
                     (if (i < other.digit.size) other.digit[i] else 0)
         )
-        f.norm()
+        f.normalize()
         return f
     }
 
@@ -88,8 +97,8 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
         for (i in 0 until g) f.digit.add(
             digit[i] - if (i < other.digit.size) other.digit[i] else 0
         )
-        f.norm()
-        f.trim()
+        f.normalize()
+        f.trimToSize()
         return f
     }
 
@@ -103,7 +112,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
         for (i in 0..digit.lastIndex)
             for (j in 0..other.digit.lastIndex)
                 f.digit[i + j] += digit[i] * other.digit[j]
-        f.norm()
+        f.normalize()
         return f
     }
 
@@ -111,7 +120,7 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      * Деление и остаток
      */
     private fun divMod(other: UnsignedBigInteger): Pair<UnsignedBigInteger, UnsignedBigInteger> {
-       if (other.digit[0] == 0 && other.digit.lastIndex == 0) throw ArithmeticException("divide by zero")
+        if (other.digit[0] == 0 && other.digit.lastIndex == 0) throw ArithmeticException("divide by zero")
         when (compareTo(other)) {
             -1 -> return Pair(UnsignedBigInteger(0), UnsignedBigInteger(this))
             0 -> return Pair(UnsignedBigInteger(1), UnsignedBigInteger(0))
@@ -159,8 +168,8 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                 if (d != 0) rem.digit[other.digit.lastIndex + r] += d * 10
             }
         }
-        rez.trim()
-        rem.trim()
+        rez.trimToSize()
+        rem.trimToSize()
         return Pair(rez, rem)
     }
 
@@ -195,7 +204,6 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
                 return if (digit[i] > other.digit[i]) 1 else -1
         return 0
     }
-
 
     /**
      * Преобразование в строку
