@@ -211,7 +211,7 @@ fun lineBySegment(s: Segment) = lineByPoints(s.begin, s.end)
  */
 fun lineByPoints(a: Point, b: Point): Line {
     val alf = acos((if (b.y >= a.y) b.x - a.x else a.x - b.x) / a.distance(b))
-    return Line(a, alf)
+    return Line(a, alf % PI)
 }
 
 /**
@@ -224,13 +224,6 @@ fun bisectorByPoints(a: Point, b: Point): Line {
     val alfa = (lineByPoints(a, b).angle + PI / 2.0) % PI
 //    if(alfa < PI / 2.0) alfa += PI / 2.0 else alfa -= PI / 2.0
     return Line(p, alfa)
-}
-
-fun main() {
-    val l1 = lineByPoints(Point(0.0, 0.0), Point(1.0, 1.0))
-    val l2 = lineByPoints(Point(0.0, 2.0), Point(2.0, 0.0))
-    println(l1.crossPoint(l2))
-    println(bisectorByPoints(Point(2.0, 2.0), Point(4.0, 4.0)))
 }
 
 /**
@@ -304,4 +297,3 @@ fun minContainingCircle(vararg points: Point): Circle {
                 cr = circleByThreePoints(points[i], dia.begin, dia.end)
     return cr
 }
-
