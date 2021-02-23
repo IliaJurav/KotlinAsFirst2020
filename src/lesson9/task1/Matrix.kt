@@ -2,6 +2,8 @@
 
 package lesson9.task1
 
+import lesson11.task1.Rational
+
 // Урок 9: проектирование классов
 // Максимальное количество баллов = 40 (без очень трудных задач = 15)
 
@@ -44,32 +46,68 @@ interface Matrix<E> {
  * height = высота, width = ширина, e = чем заполнить элементы.
  * Бросить исключение IllegalArgumentException, если height или width <= 0.
  */
-fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = TODO()
+fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
+    if (height <= 0 || width <= 0) throw IllegalArgumentException("error")
+    val m = MatrixImpl<E>(height, width)
+    for (j in 0 until width)
+        for (i in 0 until height)
+            m[i, j] = e
+    return m
+}
+
 
 /**
  * Средняя сложность (считается двумя задачами в 3 балла каждая)
  *
  * Реализация интерфейса "матрица"
  */
-class MatrixImpl<E> : Matrix<E> {
-    override val height: Int = TODO()
+class MatrixImpl<E>(h: Int, w: Int) : Matrix<E> {
+    private val table = mutableMapOf<Cell, E>()
 
-    override val width: Int = TODO()
+    override val height: Int = h
 
-    override fun get(row: Int, column: Int): E = TODO()
+    override val width: Int = w
 
-    override fun get(cell: Cell): E = TODO()
+    override fun get(row: Int, column: Int): E = get(Cell(row, column))
+
+    override fun get(cell: Cell): E {
+        if (cell !in table.keys || table[cell] == null) throw IllegalArgumentException("index error")
+        return table.getValue(cell)
+    }
 
     override fun set(row: Int, column: Int, value: E) {
-        TODO()
+        set(Cell(row, column), value)
     }
 
     override fun set(cell: Cell, value: E) {
-        TODO()
+        if (cell.row !in 0 until height || cell.column !in 0 until width)
+            throw IllegalArgumentException("index error")
+        table[cell] = value
     }
 
-    override fun equals(other: Any?) = TODO()
+    override fun equals(other: Any?) =
+        when {
+            this === other -> true
+            other is MatrixImpl<*> -> table == other.table
+            else -> false
+        }
 
-    override fun toString(): String = TODO()
+    override fun toString(): String = table.toString()
+
+    fun toSqr(w: Int = 3) {
+        for (i in 0 until height) {
+            for (j in 0 until width) print(
+                table[Cell(i, j)].toString().padStart(w)
+            )
+            println()
+        }
+    }
+
+    override fun hashCode(): Int {
+        var result = table.hashCode()
+        result = 31 * result + height
+        result = 31 * result + width
+        return result
+    }
 }
 

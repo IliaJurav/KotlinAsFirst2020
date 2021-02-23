@@ -39,11 +39,7 @@ class PhoneBook() {
      * и false, если человек с таким именем отсутствовал в телефонной книге
      * (во втором случае телефонная книга не должна меняться).
      */
-    fun removeHuman(name: String): Boolean {
-        if (name !in book.keys) return false
-        book.remove(name)
-        return true
-    }
+    fun removeHuman(name: String) = book.remove(name) != null
 
     /**
      * Добавить номер телефона.
@@ -53,9 +49,9 @@ class PhoneBook() {
      * либо такой номер телефона зарегистрирован за другим человеком.
      */
     fun addPhone(name: String, phone: String): Boolean {
-        if (name !in book.keys) return false
+        val ph = book[name] ?: return false
         if (book.values.any { phone in it }) return false
-        book[name]?.add(phone)
+        ph.add(phone)
         return true
     }
 
@@ -65,19 +61,13 @@ class PhoneBook() {
      * и false, если человек с таким именем отсутствовал в телефонной книге
      * либо у него не было такого номера телефона.
      */
-    fun removePhone(name: String, phone: String): Boolean {
-        if (name !in book.keys) return false
-        if (book[name]?.contains(phone) == false) return false
-        book[name]?.remove(phone)
-        return true
-    }
+    fun removePhone(name: String, phone: String) = book[name]?.remove(phone) != null ?: false
 
     /**
      * Вернуть все номера телефона заданного человека.
      * Если этого человека нет в книге, вернуть пустой список
      */
-    fun phones(name: String) = if (name !in book.keys) emptySet()
-    else book.getValue(name)
+    fun phones(name: String) = book.getOrDefault(name, mutableSetOf())
 
     /**
      * Вернуть имя человека по заданному номеру телефона.
@@ -93,11 +83,10 @@ class PhoneBook() {
      * и каждому человеку соответствует одинаковый набор телефонов.
      * Порядок людей / порядок телефонов в книге не должен иметь значения.
      */
-    private fun compare(obook:Map<String, MutableSet<String>>) = book == obook
 
     override fun equals(other: Any?): Boolean {
         if (other !is PhoneBook) return false
-        return other.compare(book)
+        return other.book == book
     }
 
     override fun hashCode() = book.hashCode()

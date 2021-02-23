@@ -3,7 +3,9 @@
 package lesson9.task2
 
 import lesson9.task1.Matrix
+import lesson9.task1.MatrixImpl
 import lesson9.task1.createMatrix
+import kotlin.math.min
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -60,7 +62,29 @@ operator fun Matrix<Int>.plus(other: Matrix<Int>): Matrix<Int> {
  * 10 11 12  5
  *  9  8  7  6
  */
-fun generateSpiral(height: Int, width: Int): Matrix<Int> = TODO()
+fun generateSpiral(height: Int, width: Int): Matrix<Int> {
+    val m = createMatrix(height, width, 0)
+    var top = 0
+    var left = 0
+    var bt = height - 1
+    var rt = width - 1
+    var v = 1
+    while (top <= bt && left <= rt) {
+        for (i in left until rt) m[top, i] = v++
+        for (i in top until bt) m[i, rt] = v++
+        if (left == rt || top == bt) {
+            m[bt, rt] = v
+            break
+        }
+        for (i in rt downTo left + 1) m[bt, i] = v++
+        for (i in bt downTo top + 1) m[i, left] = v++
+        top++
+        left++
+        bt--
+        rt--
+    }
+    return m
+}
 
 /**
  * Сложная (5 баллов)
@@ -76,7 +100,15 @@ fun generateSpiral(height: Int, width: Int): Matrix<Int> = TODO()
  *  1  2  2  2  2  1
  *  1  1  1  1  1  1
  */
-fun generateRectangles(height: Int, width: Int): Matrix<Int> = TODO()
+fun generateRectangles(height: Int, width: Int): Matrix<Int> {
+    val m = createMatrix(height, width, 1)
+    for (i in 1 until height - 1)
+        for (j in 1 until width - 1) {
+            m[i, j] = min(min(j + 1, width - j), min(i + 1, height - i))
+        }
+    return m
+}
+
 
 /**
  * Сложная (5 баллов)
@@ -91,7 +123,31 @@ fun generateRectangles(height: Int, width: Int): Matrix<Int> = TODO()
  * 10 13 16 18
  * 14 17 19 20
  */
-fun generateSnake(height: Int, width: Int): Matrix<Int> = TODO()
+fun generateSnake(height: Int, width: Int): Matrix<Int> {
+    val m = createMatrix(height, width, 0)
+    var v = 1
+    for (d in 0..height + width - 2) {
+        var h = 0
+        var w = d - h
+        if (w >= width) {
+            w = width - 1
+            h = d - w
+        }
+        while (w >= 0 && h < height) {
+            m[h, w] = v++
+            h++
+            w--
+        }
+    }
+    return m
+}
+
+
+fun main() {
+    val s = generateSnake(10, 10)
+    (s as MatrixImpl).toSqr(5)
+}
+
 
 /**
  * Средняя (3 балла)
@@ -104,7 +160,15 @@ fun generateSnake(height: Int, width: Int): Matrix<Int> = TODO()
  * 4 5 6      8 5 2
  * 7 8 9      9 6 3
  */
-fun <E> rotate(matrix: Matrix<E>): Matrix<E> = TODO()
+fun <E> rotate(matrix: Matrix<E>): Matrix<E> {
+    if (matrix.height != matrix.width) throw IllegalArgumentException("error")
+    val m = createMatrix(matrix.height, matrix.width, matrix[0, 0])
+    val n = matrix.width - 1
+    for (i in 0..n)
+        for (j in 0..n)
+            m[i, j] = matrix[n - j, i]
+    return m
+}
 
 /**
  * Сложная (5 баллов)
@@ -119,7 +183,22 @@ fun <E> rotate(matrix: Matrix<E>): Matrix<E> = TODO()
  * 1 2 3
  * 3 1 2
  */
-fun isLatinSquare(matrix: Matrix<Int>): Boolean = TODO()
+fun isLatinSquare(matrix: Matrix<Int>): Boolean {
+    if (matrix.height != matrix.width) return false
+    val b = mutableSetOf<Int>()
+    for (i in 1..matrix.height)
+        b.add(i)
+    for (i in 0 until matrix.height) {
+        val f = mutableSetOf<Int>()
+        val g = mutableSetOf<Int>()
+        for (j in 0 until matrix.width) {
+            f.add(matrix[i, j])
+            g.add(matrix[j, i])
+        }
+        if (f != b || g != b) return false
+    }
+    return true
+}
 
 /**
  * Средняя (3 балла)
@@ -138,7 +217,25 @@ fun isLatinSquare(matrix: Matrix<Int>): Boolean = TODO()
  *
  * 42 ===> 0
  */
-fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> = TODO()
+fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> {
+    // if (matrix.height == 1  matrix.width) throw IllegalArgumentException("error")
+    val m = createMatrix(matrix.height, matrix.width, 0)
+    val w = matrix.width - 1
+    val h = matrix.height - 1
+    for (i in 0..h)
+        for (j in 0..w) {
+            var sum = 0
+            for (di in -1..1)
+                for (dj in -1..1) {
+                    if (di == 0 && dj == 0) continue
+                    if (i + di in 0..h && j + dj in 0..w)
+                        sum += matrix[i + di, j + dj]
+                }
+            m[i, j] = sum
+        }
+    return m
+}
+
 
 /**
  * Средняя (4 балла)
@@ -146,7 +243,7 @@ fun sumNeighbours(matrix: Matrix<Int>): Matrix<Int> = TODO()
  * Целочисленная матрица matrix состоит из "дырок" (на их месте стоит 0) и "кирпичей" (на их месте стоит 1).
  * Найти в этой матрице все ряды и колонки, целиком состоящие из "дырок".
  * Результат вернуть в виде Holes(rows = список дырчатых рядов, columns = список дырчатых колонок).
- * Ряды и колонки нумеруются с нуля. Любой из спискоов rows / columns может оказаться пустым.
+ * Ряды и колонки нумеруются с нуля. Любой из списков rows / columns может оказаться пустым.
  *
  * Пример для матрицы 5 х 4:
  * 1 0 1 0
@@ -184,7 +281,12 @@ fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> = TODO()
  * Инвертировать заданную матрицу.
  * При инвертировании знак каждого элемента матрицы следует заменить на обратный
  */
-operator fun Matrix<Int>.unaryMinus(): Matrix<Int> = TODO(this.toString())
+operator fun Matrix<Int>.unaryMinus(): Matrix<Int>{
+    for (i in 0 until height)
+        for (j in 0 until width)
+            this[i,j] = - this[i,j]
+    return this
+}
 
 /**
  * Средняя (4 балла)
@@ -194,7 +296,19 @@ operator fun Matrix<Int>.unaryMinus(): Matrix<Int> = TODO(this.toString())
  * В противном случае бросить IllegalArgumentException.
  * Подробно про порядок умножения см. статью Википедии "Умножение матриц".
  */
-operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> = TODO(this.toString())
+operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int>{
+    if (width != other.height) throw IllegalArgumentException()
+    val m = createMatrix(height, other.width, 0)
+    for (i in 0 until m.height)
+        for (j in 0 until m.width) {
+            var pr = 0
+            for(h in 0 until width)
+                pr += this[i,h] * other[h,j]
+        m[i,j] = pr
+        }
+    return m
+}
+
 
 /**
  * Сложная (7 баллов)

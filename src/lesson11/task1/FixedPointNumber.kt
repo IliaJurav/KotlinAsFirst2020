@@ -3,8 +3,9 @@
 package lesson11.task1
 
 import java.lang.IllegalArgumentException
-import java.lang.Integer.max
+import java.lang.Integer.*
 import java.lang.StrictMath.abs
+import kotlin.math.roundToInt
 
 /**
  * Класс "вещественное число с фиксированной точкой"
@@ -23,19 +24,12 @@ import java.lang.StrictMath.abs
 class FixedPointNumber(private val integer: Int, private val fractional: Int) :
     Comparable<FixedPointNumber> {
 
+    val frac10 = pow10(fractional)
+
     /**
      * Точность - число десятичных цифр после запятой.
      */
-    val precision: Int
-        get() : Int {
-            var k = 0
-            var d = fractional
-            while (d > 1) {
-                d /= 10
-                k++
-            }
-            return k
-        }
+    val precision = fractional
 
     /**
      * Вспомогательная статическая функция вызываемая из конструктора
@@ -62,14 +56,17 @@ class FixedPointNumber(private val integer: Int, private val fractional: Int) :
      * Конструктор из вещественного числа с заданной точностью
      */
     constructor(d: Double, p: Int) : this(
-        ((d * pow10(p + 1)).toInt() + if (d >= 0.0) 5 else -5) / 10,
-        pow10(p)
+        with((d * pow10(p))) {
+            if (abs(this) > (MAX_VALUE-1)) throw IllegalArgumentException("Very big")
+            else this.roundToInt()
+        },
+        p
     )
 
     /**
      * Конструктор из целого числа (предполагает нулевую точность)
      */
-    constructor(i: Int) : this(i, 1)
+    constructor(i: Int) : this(i, 0)
 
     /**
      * Сложение.
@@ -78,16 +75,11 @@ class FixedPointNumber(private val integer: Int, private val fractional: Int) :
      * точность результата выбирается как наибольшая точность аргументов.
      * Лишние знаки отрбрасываются, число округляется по правилам арифметики.
      */
-    operator fun plus(other: FixedPointNumber) = if (fractional >= other.fractional)
+    operator fun plus(other: FixedPointNumber) =
         FixedPointNumber(
-            integer + other.integer * (fractional / other.fractional), fractional
+            toDouble() + other.toDouble(),
+            max(fractional, other.fractional)
         )
-    else
-        FixedPointNumber(
-            other.integer + integer * (other.fractional / fractional),
-            other.fractional
-        )
-
 
     /**
      * Смена знака
@@ -97,42 +89,30 @@ class FixedPointNumber(private val integer: Int, private val fractional: Int) :
     /**
      * Вычитание
      */
-    operator fun minus(other: FixedPointNumber) = if (fractional >= other.fractional)
+    operator fun minus(other: FixedPointNumber) =
         FixedPointNumber(
-            integer - other.integer * (fractional / other.fractional),
-            fractional
-        )
-    else
-        FixedPointNumber(
-            integer * (other.fractional / fractional) - other.integer,
-            other.fractional
+            toDouble() - other.toDouble(),
+            max(fractional, other.fractional)
         )
 
     /**
      * Умножение
      */
-    operator fun times(other: FixedPointNumber): FixedPointNumber {
-        val pMax = max(fractional, other.fractional)
-        val pMin = fractional.coerceAtMost(other.fractional)
-        return FixedPointNumber((other.integer * integer + pMin / 2) / pMin, pMax)
-    }
+    operator fun times(other: FixedPointNumber) =
+        FixedPointNumber(
+            toDouble() * other.toDouble(),
+            max(fractional, other.fractional)
+        )
 
     /**
      * Деление
      */
     operator fun div(other: FixedPointNumber): FixedPointNumber {
         if (integer == 0) throw IllegalArgumentException(" div by 0")
-        if (fractional >= other.fractional)
-            return FixedPointNumber(
-                ((integer * other.fractional * 10) / other.integer + 5) / 10,
-                fractional
-            )
-        else
-            return FixedPointNumber(
-                (((integer * other.fractional * 10) *
-                        (other.fractional / fractional)) / other.integer + 5) / 10,
-                other.fractional
-            )
+        return FixedPointNumber(
+            toDouble() / other.toDouble(),
+            max(fractional, other.fractional)
+        )
     }
 
     /**
@@ -157,15 +137,15 @@ class FixedPointNumber(private val integer: Int, private val fractional: Int) :
      * Преобразование в строку
      */
     override fun toString(): String =
-        "${integer / fractional}" + if (fractional == 1) "" else String.format(
+        "${integer / frac10}" + if (fractional == 0) "" else String.format(
             ".%0${precision}d",
-            abs(integer) % fractional
+            abs(integer) % frac10
         )
 
     /**
      * Преобразование к вещественному числу
      */
-    fun toDouble(): Double = integer.toDouble() / fractional.toDouble()
+    fun toDouble(): Double = integer.toDouble() / frac10.toDouble()
 
     override fun hashCode(): Int {
         var result = integer.hashCode()
@@ -174,5 +154,4 @@ class FixedPointNumber(private val integer: Int, private val fractional: Int) :
     }
 
 }
-
 

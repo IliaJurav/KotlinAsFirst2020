@@ -34,7 +34,9 @@ class Complex(val re: Double, val im: Double) {
             for (ch in s) {
                 when (ch) {
                     in '0'..'9' -> {
-                        dig = dig * 10 + ch.toInt() - 48; comma *= 10; data = true
+                        dig = dig * 10 + (ch - '0')
+                        comma *= 10
+                        data = true
                     }
                     '.' -> if (comma == 0) comma = 1
                     else throw IllegalArgumentException("Syntax error")
@@ -101,10 +103,8 @@ class Complex(val re: Double, val im: Double) {
      * Сравнение на равенство
      */
     override fun equals(other: Any?): Boolean {
-        if (other is Complex) return re == other.re && im == other.im
-        if (other is Double) return re == other && im == 0.0
-        if (other is Int) return re == other.toDouble() && im == 0.0
-        throw IllegalArgumentException("Incompatible types")
+        if (other !is Complex) throw IllegalArgumentException("Incompatible types")
+        return re == other.re && im == other.im
     }
 
     /**

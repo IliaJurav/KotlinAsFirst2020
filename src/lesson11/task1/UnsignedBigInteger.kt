@@ -21,21 +21,20 @@ class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
      */
     constructor(s: String) {
         if (!Regex("""\d+""").matches(s)) throw IllegalArgumentException("Illegal char")
-        s.toList().reversed().forEach { digit.add(it.toInt() - '0'.toInt()) }
+        s.reversed().mapTo(digit){it - '0'}
     }
 
     /**
      * Конструктор из целого
      */
-    constructor(i: Int?) {
-        if (i is Int) {
-            digit.add(i)
-            norm()
-        }
+    constructor(i: Int) {
+        if (i < 0) throw IllegalArgumentException("Illegal value")
+        digit.add(i)
+        norm()
     }
 
-    constructor(k: UnsignedBigInteger) {
-        digit.addAll(k.digit)
+    constructor(k: UnsignedBigInteger?) {
+        if (k is UnsignedBigInteger) digit.addAll(k.digit)
     }
 
     private fun norm(): Boolean {
