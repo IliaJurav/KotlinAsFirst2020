@@ -167,7 +167,6 @@ class Line private constructor(val b: Double, val angle: Double) {
      * Для этого необходимо составить и решить систему из двух уравнений (каждое для своей прямой)
      */
     fun crossPoint(other: Line): Point {
-        //    println(toString() + " " + other)
         if (angle == other.angle) throw IllegalArgumentException("Прямые параллельны")
         val x = (other.b / cos(other.angle) - b / cos(angle)) / (tan(angle) - tan(other.angle))
         var v = if (abs(cos(angle)) <= 1e-5) 1 else 0
@@ -181,8 +180,6 @@ class Line private constructor(val b: Double, val angle: Double) {
             2 -> return Point(-other.b, -other.b * tan(angle) + b / cos(angle))
         }
         val y = x * tan(angle) + b / cos(angle)
-        //    val y2 = x * tan(other.angle) + other.b / cos(other.angle)
-        //   println("y = $y  y2 = $y2")
         return Point(x, y)
     }
 
@@ -222,7 +219,6 @@ fun lineByPoints(a: Point, b: Point): Line {
 fun bisectorByPoints(a: Point, b: Point): Line {
     val p = Point((a.x + b.x) / 2.0, (a.y + b.y) / 2.0)
     val alfa = (lineByPoints(a, b).angle + PI / 2.0) % PI
-//    if(alfa < PI / 2.0) alfa += PI / 2.0 else alfa -= PI / 2.0
     return Line(p, alfa)
 }
 
@@ -266,7 +262,14 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
  * построить окружность, описанную вокруг треугольника - эквивалентная задача).
  */
 fun circleByThreePoints(a: Point, b: Point, c: Point): Circle {
-    val cen = bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c))
+    val distAB = a.distance(b)
+    val distAC = a.distance(c)
+    val distBC = b.distance(c)
+    val cen = if (distAB < distAC && distAB < distBC)
+        bisectorByPoints(a, c).crossPoint(bisectorByPoints(b, c))
+    else if (distAC < distAB && distAC < distBC)
+        bisectorByPoints(a, b).crossPoint(bisectorByPoints(b, c))
+    else bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c))
     return Circle(cen, max(cen.distance(a), max(cen.distance(b), cen.distance(c))))
 }
 
@@ -297,3 +300,4 @@ fun minContainingCircle(vararg points: Point): Circle {
                 cr = circleByThreePoints(points[i], dia.begin, dia.end)
     return cr
 }
+

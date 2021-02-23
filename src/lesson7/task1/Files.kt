@@ -176,17 +176,20 @@ fun centerFile(inputName: String, outputName: String) {
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
     val txt = File(inputName).readLines().map { it.trim().split(Regex("""\s+""")) }
-
+    if (txt.isEmpty()){
+        File(outputName).bufferedWriter().use { out -> out.write("")}
+        return
+    }
     val maxLen = txt.maxOf { line -> line.count() - 1 + line.sumOf { it.length } }
     File(outputName).bufferedWriter().use { out ->
         txt.forEach { line ->
-            if (line.count() > 0)out.write(line[0])
+            if (line.count() > 0) out.write(line[0])
             if (line.count() > 1) {
                 val spsLen = maxLen - line.sumOf { it.length }
                 val sp = spsLen / (line.count() - 1)
                 val esp = spsLen % (line.count() - 1)
                 for (k in 1..line.lastIndex) {
-                    out.write(" ".padStart(if (esp >= k)sp+1 else sp))
+                    out.write(" ".padStart(if (esp >= k) sp + 1 else sp))
                     out.write(line[k])
                 }
             }
