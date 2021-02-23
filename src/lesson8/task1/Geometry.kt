@@ -271,8 +271,8 @@ fun circleByThreePoints(a: Point, b: Point, c: Point): Circle {
     val cBC = with(bisectorByPoints(a, b).crossPoint(bisectorByPoints(a, c))) {
         Circle(this, max(this.distance(a), max(this.distance(b), this.distance(c))))
     }
-    return if (cAB.radius < cAC.radius && cAB.radius < cBC.radius) cAB else
-        if (cAC.radius < cAB.radius && cAC.radius < cBC.radius) cAC else
+    return if (cAB.radius <= cAC.radius && cAB.radius <= cBC.radius) cAB else
+        if (cAC.radius <= cAB.radius && cAC.radius <= cBC.radius) cAC else
             cBC
 }
 
@@ -302,4 +302,3 @@ fun minContainingCircle(vararg points: Point): Circle {
                 cr = circleByThreePoints(points[i], dia.begin, dia.end)
     return cr
 }
-
