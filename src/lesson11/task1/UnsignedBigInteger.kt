@@ -14,7 +14,7 @@ import kotlin.math.max
  * сравнение на равенство и неравенство
  */
 class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
-    private val digit: ArrayList<Int> = ArrayList()
+    private val digit = mutableListOf<Int>()
 
     /**
      * Конструктор из строки

@@ -61,7 +61,7 @@ class PhoneBook() {
      * и false, если человек с таким именем отсутствовал в телефонной книге
      * либо у него не было такого номера телефона.
      */
-    fun removePhone(name: String, phone: String) = book[name]?.remove(phone) != null ?: false
+    fun removePhone(name: String, phone: String) = book[name]?.remove(phone) ?: false
 
     /**
      * Вернуть все номера телефона заданного человека.

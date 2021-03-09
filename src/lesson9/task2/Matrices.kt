@@ -281,10 +281,10 @@ fun sumSubMatrix(matrix: Matrix<Int>): Matrix<Int> = TODO()
  * Инвертировать заданную матрицу.
  * При инвертировании знак каждого элемента матрицы следует заменить на обратный
  */
-operator fun Matrix<Int>.unaryMinus(): Matrix<Int>{
+operator fun Matrix<Int>.unaryMinus(): Matrix<Int> {
     for (i in 0 until height)
         for (j in 0 until width)
-            this[i,j] = - this[i,j]
+            this[i, j] = -this[i, j]
     return this
 }
 
@@ -296,15 +296,15 @@ operator fun Matrix<Int>.unaryMinus(): Matrix<Int>{
  * В противном случае бросить IllegalArgumentException.
  * Подробно про порядок умножения см. статью Википедии "Умножение матриц".
  */
-operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int>{
+operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> {
     if (width != other.height) throw IllegalArgumentException()
     val m = createMatrix(height, other.width, 0)
     for (i in 0 until m.height)
         for (j in 0 until m.width) {
             var pr = 0
-            for(h in 0 until width)
-                pr += this[i,h] * other[h,j]
-        m[i,j] = pr
+            for (h in 0 until width)
+                pr += this[i, h] * other[h, j]
+            m[i, j] = pr
         }
     return m
 }
@@ -330,7 +330,23 @@ operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int>{
  * Вернуть тройку (Triple) -- (да/нет, требуемый сдвиг по высоте, требуемый сдвиг по ширине).
  * Если наложение невозможно, то первый элемент тройки "нет" и сдвиги могут быть любыми.
  */
-fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> = TODO()
+fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> {
+    if (key.height > lock.height || key.width > lock.width)
+        throw IllegalArgumentException("error")
+    for (dy in 0..lock.height - key.height)
+        for (dx in 0..lock.width - key.width) {
+            var g = true
+            checkKey@
+            for (y in 0 until key.height)
+                for (x in 0 until key.width)
+                    if (key[y, x] == lock[y + dy, x + dx]) {
+                        g = false
+                        break@checkKey
+                    }
+            if (g) return Triple(true, dy, dx)
+        }
+    return Triple(false, 0, 0)
+}
 
 /**
  * Сложная (8 баллов)
