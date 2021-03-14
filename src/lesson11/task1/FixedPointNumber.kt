@@ -128,15 +128,11 @@ class FixedPointNumber(private val integer: Int, val precision: Int) :
      */
     operator fun div(other: FixedPointNumber): FixedPointNumber {
         if (integer == 0) throw IllegalArgumentException(" div by 0")
-        with(max(precision, other.precision)){
+        return with(max(precision, other.precision)){
             FixedPointNumber(
                 toPrec(this + other.precision) / other.integer.toLong(),
                 this)
         }
-        return FixedPointNumber(
-            toDouble() / other.toDouble(),
-            max(precision, other.precision)
-        )
     }
 
     /**
